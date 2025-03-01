@@ -7,6 +7,7 @@ import './App.css';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
+import About from './pages/About';
 
 /**
  * App component - Main container for the Name Here application
@@ -15,14 +16,31 @@ import Home from './pages/Home';
 function App() {
   // State management
   const [isLoggedIn] = useState(false); // User authentication state
+  const [currentPage, setCurrentPage] = useState('home'); // Track current page
+
+  // Simple routing function
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'about':
+        return <About />;
+      case 'home':
+      default:
+        return <Home />;
+    }
+  };
+
+  // Handle navigation clicks
+  const handleNavigation = (page: string) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div className="App">
       {/* Navigation bar component */}
-      <Navbar isLoggedIn={isLoggedIn} />
+      <Navbar isLoggedIn={isLoggedIn} onNavigate={handleNavigation} currentPage={currentPage} />
       
-      {/* Main content - currently just the home page */}
-      <Home />
+      {/* Render the current page based on state */}
+      {renderPage()}
       
       {/* Footer component */}
       <Footer />

@@ -10,9 +10,14 @@ import './Navbar.css';
 /**
  * Props interface for the Navbar component
  * @property {boolean} isLoggedIn - Flag indicating whether a user is currently logged in
- */
+ * @property {function} onNavigate - Callback function for navigation events
+ * @property {string} currentPage - Currently active page
+*/
+
 interface NavbarProps {
   isLoggedIn: boolean;
+  onNavigate: (page: string) => void;
+  currentPage: string;
 }
 
 /**
@@ -21,19 +26,38 @@ interface NavbarProps {
  * @param {NavbarProps} props - Component props
  * @returns {JSX.Element} - Rendered navigation bar
  */
-const Navbar: React.FC<NavbarProps> = ({ isLoggedIn }) => {
+const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onNavigate, currentPage }) => {
+  
+  // Handler for navigation links
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, page: string) => {
+    e.preventDefault();
+    onNavigate(page);
+  };
+  
   return (
     <nav className="navbar">
       {/* Application logo and brand name */}
-      <div className="navbar-logo">
+      <div className="navbar-logo" onClick={(e) => handleNavClick(e as any, 'home')} style={{ cursor: 'pointer' }}>
         <span className="logo-icon">🍴</span> Name Here
       </div>
       
       {/* Navigation links section */}
       <div className="navbar-links">
         {/* Common navigation links */}
-        <a href="/" className="nav-link">Home</a>
-        <a href="/about" className="nav-link">About</a>
+        <a 
+          href="/" 
+          className={`nav-link ${currentPage === 'home' ? 'active' : ''}`}
+          onClick={(e) => handleNavClick(e, 'home')}
+        >
+          Home
+        </a>
+        <a 
+          href="/about" 
+          className={`nav-link ${currentPage === 'about' ? 'active' : ''}`}
+          onClick={(e) => handleNavClick(e, 'about')}
+        >
+          About
+        </a>
         
         {/* Conditional rendering based on authentication status */}
         {!isLoggedIn ? (
