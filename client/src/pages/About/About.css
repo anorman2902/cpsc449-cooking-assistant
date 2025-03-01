@@ -1,0 +1,161 @@
+.about-page {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
+  .about-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .about-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .about-title {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  .about-subtitle {
+    font-size: 1rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .about-section {
+    margin-bottom: 4rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--dark-color);
+  }
+  
+  .section-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #444;
+  }
+  
+  /* Features*/
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .feature-card {
+    background-color: #f8f9fa;
+    border-radius: var(--border-radius-md, 8px);
+    padding: 0.5rem 1.5rem;
+    box-shadow: var(--shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md, 0 4px 8px rgba(0, 0, 0, 0.12));
+  }
+  
+  .feature-icon {
+    font-size: 1.5rem;
+  }
+  
+  .feature-card h3 {
+    font-size: 1.1rem;
+    color: #333;
+  }
+  
+  .feature-card p {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* How It Works*/
+  .how-it-works {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+  
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  
+  .step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+  
+  .step-content h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  .step-content p {
+    color: #666;
+    line-height: 1.5;
+  }
+  
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .about-content {
+      padding: 1.5rem;
+    }
+    
+    .about-title {
+      font-size: 2rem;
+    }
+    
+    .about-subtitle {
+      font-size: 1.1rem;
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+    }
+    
+    .features-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .step {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .step-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+  
