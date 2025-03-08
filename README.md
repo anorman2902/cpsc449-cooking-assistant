@@ -5,7 +5,9 @@ A lightweight React-based web application that helps users find recipes based on
 ## Features
 
 - **Recipe Search**: Search for recipes based on available ingredients
+- **Search Results Template**: Template page for displaying search results
 - **Clean, Minimalist UI**: Focus on simplicity and ease of use
+- **Responsive Design**: Optimized for all device sizes
 
 ## Project Structure
 
@@ -14,11 +16,14 @@ The project is organized with a scalable architecture to support future growth:
 ```
 /
 ├── client/                  # Frontend code
+│   ├── docs/                # Documentation
+│   │   └── search-results-template.md  # Search results template documentation
+│   │   └── README.md        # README for docs
 │   ├── public/              # Static files
-│   │   ├── index.html:      # Main HTML file
-│   │   ├── favicon.ico:     # Website favicon
-│   │   ├── manifest.json:   # Web app manifest for PWA support
-│   │   └── robots.txt:      # Instructions for web crawlers
+│   │   ├── index.html       # Main HTML file
+│   │   ├── favicon.ico      # Website favicon
+│   │   ├── manifest.json    # Web app manifest for PWA support
+│   │   └── robots.txt       # Instructions for web crawlers
 │   ├── src/
 │   │   ├── assets/          # Images, fonts, etc.
 │   │   ├── components/      # Reusable UI components
@@ -28,9 +33,13 @@ The project is organized with a scalable architecture to support future growth:
 │   │   │   │   ├── Navbar/  # Navigation bar component
 │   │   │   │   └── Footer/  # Footer component
 │   │   │   └── features/    # Feature-specific components
+│   │   ├── contexts/        # React context providers
+│   │   │   └── ThemeContext/  # Theme management context
 │   │   ├── hooks/           # Custom React hooks
 │   │   ├── pages/           # Page components
-│   │   │   └── Home/        # Home page
+│   │   │   ├── Home/        # Home page
+│   │   │   ├── About/       # About page
+│   │   │   └── SearchResults/  # Search results page
 │   │   ├── services/        # API services
 │   │   ├── utils/           # Utility functions
 │   │   ├── styles/          # Global styles
@@ -73,6 +82,7 @@ npm start
 - **Component-Based Architecture**: Modular components for better maintainability
 - **Responsive Design**: Mobile-first approach with responsive layouts
 - **Scalable Project Structure**: Organized for future growth with additional pages and backend
+- **Simple Routing**: State-based routing for navigation between pages
 
 ## Project Organization
 
@@ -90,9 +100,30 @@ The project follows a professional organization pattern:
 
 - **Frontend/Backend Separation**: Clear separation between client and server code
 
+- **Documentation**: Comprehensive documentation in the `docs` directory:
+  - Template usage guides
+  - Future enhancement plans
+  - Implementation details
+
+## Search Functionality
+
+The application includes a search feature that allows users to:
+
+1. Enter ingredients they have or want to use
+2. Specify dietary restrictions or allergies
+3. Submit their search query
+4. View search results on a dedicated results page
+
+The search results page is currently implemented as a template that will be populated with actual data when the backend is implemented. See the [search results template documentation](client/docs/search-results-template.md) for details on how to use and extend this template.
+
 ## Future Enhancements
 
-- Backend API integration for recipe data
-- User authentication and profile management
-- Recipe saving and favorites
-- Meal planning functionality
+- **Backend API Integration**: Connect to a recipe database API
+- **User Authentication**: Login, registration, and profile management
+- **Recipe Management**: Save favorites, add notes, and customize recipes
+- **Advanced Search**: Filtering by cuisine, cooking time, and difficulty
+- **Meal Planning**: Weekly meal planning and shopping list generation
+- **Personalization**: Recommendations based on user preferences and history
+- **Social Features**: Share recipes and follow other users
+
+For detailed information about planned enhancements to the search results page, see the [search results template documentation](client/docs/search-results-template.md).
