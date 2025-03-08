@@ -5,15 +5,17 @@
  * for finding recipes based on ingredients. Handles form submission and keyboard
  * events for a smooth user experience.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SearchBar.css';
 
 /**
  * Props interface for the SearchBar component
  * @property {function} onSearch - Callback function that receives the search query
+ * @property {string} initialQuery - Optional initial value for the search input
  */
 interface SearchBarProps {
   onSearch: (query: string) => void;
+  initialQuery?: string;
 }
 
 /**
@@ -22,9 +24,14 @@ interface SearchBarProps {
  * @param {SearchBarProps} props - Component props
  * @returns {JSX.Element} - Rendered search bar component
  */
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch, initialQuery = '' }) => {
   // State to track the current search input value
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  
+  // Update searchQuery when initialQuery changes
+  useEffect(() => {
+    setSearchQuery(initialQuery);
+  }, [initialQuery]);
 
   /**
    * Handles form submission events
