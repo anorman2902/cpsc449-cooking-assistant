@@ -8,7 +8,7 @@
 .search-form {
   display: flex;
   position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.15));
   border-radius: 50px;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -16,7 +16,7 @@
 
 .search-form:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--shadow-lg, 0 6px 16px rgba(0, 0, 0, 0.18));
 }
 
 .search-input {
@@ -26,14 +26,20 @@
   border: none;
   outline: none;
   border-radius: 50px;
-  background-color: white;
-  transition: box-shadow 0.3s ease;
+  background-color: var(--input-bg, white);
+  color: var(--input-text, #333);
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
   -webkit-appearance: none;
 }
 
 .search-input:focus {
   box-shadow: none;
   outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--input-text, #333);
+  opacity: 0.6;
 }
 
 /* Mobile responsiveness */

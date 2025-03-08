@@ -8,6 +8,7 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 /**
  * App component - Main container for the Name Here application
@@ -35,16 +36,18 @@ function App() {
   };
 
   return (
-    <div className="App">
-      {/* Navigation bar component */}
-      <Navbar isLoggedIn={isLoggedIn} onNavigate={handleNavigation} currentPage={currentPage} />
-      
-      {/* Render the current page based on state */}
-      {renderPage()}
-      
-      {/* Footer component */}
-      <Footer />
-    </div>
+    <ThemeProvider>
+      <div className="App">
+        {/* Navigation bar component */}
+        <Navbar isLoggedIn={isLoggedIn} onNavigate={handleNavigation} currentPage={currentPage} />
+        
+        {/* Render the current page based on state */}
+        {renderPage()}
+        
+        {/* Footer component */}
+        <Footer />
+      </div>
+    </ThemeProvider>
   );
 }
 
