@@ -17,15 +17,18 @@
   
   .about-title {
     font-size: 2rem;
-    color: #333;
+    color: var(--text-color, #333);
     margin-bottom: 1rem;
+    transition: color 0.3s ease;
   }
   
   .about-subtitle {
     font-size: 1rem;
-    color: #666;
+    color: var(--text-color, #666);
+    opacity: 0.8;
     max-width: 600px;
     margin: 0 auto;
+    transition: color 0.3s ease;
   }
   
   .about-section {
@@ -34,17 +37,20 @@
   
   .section-title {
     font-size: 1.5rem;
-    color: #333;
+    color: var(--text-color, #333);
     margin-bottom: 1.5rem;
     position: relative;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--dark-color);
+    border-bottom: 2px solid var(--navbar-border, #e0e0e0);
+    transition: color 0.3s ease, border-color 0.3s ease;
   }
   
   .section-text {
     font-size: 1rem;
     line-height: 1.6;
-    color: #444;
+    color: var(--text-color, #444);
+    opacity: 0.9;
+    transition: color 0.3s ease;
   }
   
   /* Features*/
@@ -56,11 +62,12 @@
   }
   
   .feature-card {
-    background-color: #f8f9fa;
+    background-color: var(--card-bg, #f8f9fa);
     border-radius: var(--border-radius-md, 8px);
     padding: 0.5rem 1.5rem;
     box-shadow: var(--shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    border: 1px solid var(--card-border, transparent);
   }
   
   .feature-card:hover {
@@ -74,13 +81,16 @@
   
   .feature-card h3 {
     font-size: 1.1rem;
-    color: #333;
+    color: var(--text-color, #333);
+    transition: color 0.3s ease;
   }
   
   .feature-card p {
-    color: #666;
+    color: var(--text-color, #666);
+    opacity: 0.8;
     line-height: 1.5;
     margin-bottom: 0.5rem;
+    transition: color 0.3s ease;
   }
   
   /* How It Works*/
@@ -114,12 +124,15 @@
   .step-content h3 {
     font-size: 1.2rem;
     margin-bottom: 0.5rem;
-    color: #333;
+    color: var(--text-color, #333);
+    transition: color 0.3s ease;
   }
   
   .step-content p {
-    color: #666;
+    color: var(--text-color, #666);
+    opacity: 0.8;
     line-height: 1.5;
+    transition: color 0.3s ease;
   }
   
   /* Mobile responsiveness */

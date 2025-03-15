@@ -15,7 +15,7 @@
 
 /* Hero Section */
 .hero-section {
-  background-color: #fff;
+  background-color: var(--card-bg, #fff);
   padding: 2rem;
   text-align: center;
   width: 100%;
@@ -26,19 +26,25 @@
   align-items: center;
   justify-content: center;
   min-height: 50vh; /* Reduced from 60vh to make it more centered */
+  border-radius: var(--border-radius-lg, 12px);
+  box-shadow: var(--shadow-md, 0 4px 8px rgba(0, 0, 0, 0.12));
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .hero-title {
   font-size: 3rem;
   margin-bottom: 1rem;
-  color: #333;
+  color: var(--text-color, #333);
+  transition: color 0.3s ease;
 }
 
 .hero-subtitle {
   font-size: 1.4rem;
-  color: #666;
+  color: var(--text-color, #666);
+  opacity: 0.8;
   max-width: 700px;
   margin: 0 auto 1.5rem;
+  transition: color 0.3s ease;
 }
 
 /* Mobile responsiveness */

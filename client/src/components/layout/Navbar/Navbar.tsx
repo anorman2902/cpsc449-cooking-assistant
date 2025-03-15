@@ -6,6 +6,7 @@
  */
 import React from 'react';
 import './Navbar.css';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 /**
  * Props interface for the Navbar component
@@ -27,6 +28,8 @@ interface NavbarProps {
  * @returns {JSX.Element} - Rendered navigation bar
  */
 const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onNavigate, currentPage }) => {
+  // Get theme context
+  const { theme, toggleTheme } = useTheme();
   
   // Handler for navigation links
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, page: string) => {
@@ -43,6 +46,15 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onNavigate, currentPage }) 
       
       {/* Navigation links section */}
       <div className="navbar-links">
+        {/* Theme toggle button */}
+        <button 
+          className="theme-toggle-btn"
+          onClick={toggleTheme}
+          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+        >
+          {theme === 'light' ? '🌙' : '☀️'}
+        </button>
+        
         {/* Common navigation links */}
         <a 
           href="/" 
@@ -51,6 +63,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onNavigate, currentPage }) 
         >
           Home
         </a>
+        
         <a 
           href="/about" 
           className={`nav-link ${currentPage === 'about' ? 'active' : ''}`}
