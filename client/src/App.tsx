@@ -2,7 +2,7 @@
  * Main application component for the Name Here app.
  * Serves as the entry point and manages the overall application state and layout.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
@@ -11,16 +11,23 @@ import About from './pages/About';
 import SearchResults from './pages/SearchResults';
 import Auth from './pages/Auth';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
-/**
- * App component - Main container for the Name Here application
- * Manages application state and renders the main layout
- */
-function App() {
+// Content component to handle conditional rendering based on auth state
+const AppContent = () => {
   // State management
-  const [isLoggedIn] = useState(false); // User authentication state
   const [currentPage, setCurrentPage] = useState('home'); // Track current page
   const [searchQuery, setSearchQuery] = useState(''); // Store the current search query
+
+  // Get auth context
+  const { isAuthenticated } = useAuth();
+  
+  // Effect to redirect from auth page when authenticated
+  useEffect(() => {
+    if (isAuthenticated && currentPage === 'auth') {
+      setCurrentPage('home');
+    }
+  }, [isAuthenticated, currentPage]);
 
   // Handle search functionality
   const handleSearch = (query: string) => {
@@ -51,17 +58,28 @@ function App() {
   };
 
   return (
+    <div className="App">
+      {/* Navigation bar component */}
+      <Navbar onNavigate={handleNavigation} currentPage={currentPage} />
+      
+      {/* Render the current page based on state */}
+      {renderPage()}
+      
+      {/* Footer component */}
+      <Footer />
+    </div>
+  );
+}
+
+/**
+ * App component - Main container for the Name Here application
+ */
+function App() {
+  return (
     <ThemeProvider>
-      <div className="App">
-        {/* Navigation bar component */}
-        <Navbar isLoggedIn={isLoggedIn} onNavigate={handleNavigation} currentPage={currentPage} />
-        
-        {/* Render the current page based on state */}
-        {renderPage()}
-        
-        {/* Footer component */}
-        <Footer />
-      </div>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </ThemeProvider>
   );
 }

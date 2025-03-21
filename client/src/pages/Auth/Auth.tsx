@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Auth.css';
+import { useAuth } from '../../contexts/AuthContext';
 
 function Auth() {
+    // Get auth context
+    const { login, signup, authError, clearAuthError, isAuthenticated } = useAuth();
+
     // State for tracking active form (login or signup)
     const [isLoginForm, setIsLoginForm] = useState(true);
     
@@ -15,94 +19,114 @@ function Auth() {
     const [signupPassword, setSignupPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    // Error state
-    const [error, setError] = useState('');
+    // Local error state
+    const [formError, setFormError] = useState('');
+
+    // Clear errors when switching forms
+    useEffect(() => {
+        setFormError('');
+        clearAuthError();
+    }, [isLoginForm, clearAuthError]);
 
     // Toggle between login and signup forms
     const toggleForm = () => {
         setIsLoginForm(!isLoginForm);
-        setError(''); // Clear any errors when switching forms
     };
 
     // Handle login form submission
-    const handleLoginSubmit = (e: React.FormEvent) => {
+    const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         // Validate form
         if (!loginEmail || !loginPassword) {
-        setError('Please fill in all fields');
+            setFormError('Please fill in all fields');
         return;
         }
         
         // Clear error
-        setError('');
+        setFormError('');
         
-        // TODO: Implement actual login logic
-        console.log('Login attempted with:', { email: loginEmail, password: loginPassword });
+        // Attempt login using context
+        const success = await login(loginEmail, loginPassword);
+        
+        if (success) {
+        console.log('Login successful!');
+        // The context will update isAuthenticated, and user will be redirected
+        }
     };
 
     // Handle signup form submission
-    const handleSignupSubmit = (e: React.FormEvent) => {
+    const handleSignupSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         // Validate form
         if (!username || !signupEmail || !signupPassword || !confirmPassword) {
-        setError('Please fill in all fields');
+        setFormError('Please fill in all fields');
         return;
         }
         
         if (signupPassword !== confirmPassword) {
-        setError('Passwords do not match');
+        setFormError('Passwords do not match');
         return;
         }
         
         if (signupPassword.length < 8) {
-        setError('Password must be at least 8 characters long');
+        setFormError('Password must be at least 8 characters long');
         return;
         }
         
         // Clear error
-        setError('');
+        setFormError('');
         
-        // TODO: Implement actual signup logic
-        console.log('Signup attempted with:', { username, email: signupEmail, password: signupPassword });
+        // Attempt signup using context
+        const success = await signup(username, signupEmail, signupPassword);
+        
+        if (success) {
+        console.log('Signup successful!');
+        // The context will update isAuthenticated, and user will be redirected
+        }
     };
 
     return (
         <div className="auth-page">
             <div className="auth-container">
                 <div className="auth-header">
-                <div className="auth-toggle">
-                    <button 
-                    className={`toggle-btn ${isLoginForm ? 'active' : ''}`} 
-                    onClick={() => isLoginForm ? null : toggleForm()}
-                    >
-                    Log In
-                    </button>
-                    <button 
-                    className={`toggle-btn ${!isLoginForm ? 'active' : ''}`}
-                    onClick={() => isLoginForm ? toggleForm() : null}
-                    >
-                    Sign Up
-                    </button>
-                </div>
+                    <div className="auth-toggle">
+                        <button 
+                        className={`toggle-btn ${isLoginForm ? 'active' : ''}`} 
+                        onClick={() => isLoginForm ? null : toggleForm()}
+                        >
+                        Log In
+                        </button>
+                        <button 
+                        className={`toggle-btn ${!isLoginForm ? 'active' : ''}`}
+                        onClick={() => isLoginForm ? toggleForm() : null}
+                        >
+                        Sign Up
+                        </button>
+                    </div>
                 </div>
                 
-                {error && <div className="auth-error">{error}</div>}
+                {/* Display errors (either from form validation or auth context) */}
+                {(formError || authError) && (
+                <div className="auth-error">
+                    {formError || authError}
+                </div>
+                )}
                 
                 {isLoginForm ? (
                 // Login Form
                 <form className="auth-form" onSubmit={handleLoginSubmit}>
                     <div className="form-group">
-                    <label htmlFor="loginEmail">Email</label>
-                    <input
-                        type="email"
-                        id="loginEmail"
-                        value={loginEmail}
-                        onChange={(e) => setLoginEmail(e.target.value)}
-                        placeholder="Enter your email"
-                        required
-                    />
+                        <label htmlFor="loginEmail">Email</label>
+                        <input
+                            type="email"
+                            id="loginEmail"
+                            value={loginEmail}
+                            onChange={(e) => setLoginEmail(e.target.value)}
+                            placeholder="Enter your email"
+                            required
+                        />
                     </div>
                     
                     <div className="form-group">

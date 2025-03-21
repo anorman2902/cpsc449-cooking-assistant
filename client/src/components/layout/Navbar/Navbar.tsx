@@ -7,16 +7,15 @@
 import React from 'react';
 import './Navbar.css';
 import { useTheme } from '../../../contexts/ThemeContext';
+import { useAuth } from '../../../contexts/AuthContext';
 
 /**
  * Props interface for the Navbar component
- * @property {boolean} isLoggedIn - Flag indicating whether a user is currently logged in
  * @property {function} onNavigate - Callback function for navigation events
  * @property {string} currentPage - Currently active page
 */
 
 interface NavbarProps {
-  isLoggedIn: boolean;
   onNavigate: (page: string) => void;
   currentPage: string;
 }
@@ -27,14 +26,24 @@ interface NavbarProps {
  * @param {NavbarProps} props - Component props
  * @returns {JSX.Element} - Rendered navigation bar
  */
-const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onNavigate, currentPage }) => {
+const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage }) => {
   // Get theme context
   const { theme, toggleTheme } = useTheme();
+
+  // Get authentication context
+  const { isAuthenticated, logout } = useAuth();
   
   // Handler for navigation links
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, page: string) => {
     e.preventDefault();
     onNavigate(page);
+  };
+
+  // Handle logout click
+  const handleLogout = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    logout();
+    onNavigate('home');
   };
   
   return (
@@ -73,7 +82,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onNavigate, currentPage }) 
         </a>
         
         {/* Conditional rendering based on authentication status */}
-        {!isLoggedIn ? (
+        {!isAuthenticated ? (
           // Login/Signup link for unauthenticated users
           <a href="/auth" className={`nav-link login-link ${currentPage === 'auth' ? 'active' : ''}`}
           onClick={(e) => handleNavClick(e, 'auth')}>Login/Signup</a>
@@ -82,6 +91,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onNavigate, currentPage }) 
           <>
             <a href="/favorites" className="nav-link">My Favorites</a>
             <a href="/profile" className="nav-link profile-link">Profile</a>
+            <a href="/logout" className="nav-link logout-link" onClick={handleLogout}>Logout</a>
           </>
         )}
       </div>
