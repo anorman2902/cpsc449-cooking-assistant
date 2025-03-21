@@ -75,7 +75,8 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onNavigate, currentPage }) 
         {/* Conditional rendering based on authentication status */}
         {!isLoggedIn ? (
           // Login/Signup link for unauthenticated users
-          <a href="/login" className="nav-link login-link">Login/Signup</a>
+          <a href="/auth" className={`nav-link login-link ${currentPage === 'auth' ? 'active' : ''}`}
+          onClick={(e) => handleNavClick(e, 'auth')}>Login/Signup</a>
         ) : (
           // Additional links for authenticated users
           <>

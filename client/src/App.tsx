@@ -9,6 +9,7 @@ import Footer from './components/layout/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
 import SearchResults from './pages/SearchResults';
+import Auth from './pages/Auth';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 /**
@@ -36,6 +37,8 @@ function App() {
         return <About />;
       case 'search-results':
         return <SearchResults query={searchQuery} onSearch={handleSearch} />;
+        case 'auth':
+        return <Auth />;
       case 'home':
       default:
         return <Home onSearch={handleSearch} />;
