@@ -72,7 +72,7 @@ The project is organized with a scalable architecture to support future growth:
 
 1. Clone the repository
 2. Navigate to the project directory
-3.  Set up the database if not already (see [Authentication Documentation](./docs/AUTHENTICATION.md) for details)
+3.  Set up the database if not already (see [Authentication Documentation](./docs/authentication.md) for details)
 4. Install dependencies:
 
 ```bash
