@@ -10,6 +10,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import SearchResults from './pages/SearchResults';
 import Auth from './pages/Auth';
+import Profile from './pages/Profile';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
@@ -20,12 +21,17 @@ const AppContent = () => {
   const [searchQuery, setSearchQuery] = useState(''); // Store the current search query
 
   // Get auth context
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   
   // Effect to redirect from auth page when authenticated
   useEffect(() => {
     if (isAuthenticated && currentPage === 'auth') {
       setCurrentPage('home');
+    }
+    
+    // Redirect from protected pages if not authenticated
+    if (!isAuthenticated && ['profile', 'favorites'].includes(currentPage)) {
+      setCurrentPage('auth');
     }
   }, [isAuthenticated, currentPage]);
 
@@ -39,13 +45,20 @@ const AppContent = () => {
 
   // Simple routing function
   const renderPage = () => {
+    // Show loading indicator during initial auth check
+    if (loading && ['profile', 'favorites'].includes(currentPage)) {
+      return <div className="loading-container">Loading...</div>;
+    }
+
     switch (currentPage) {
       case 'about':
         return <About />;
       case 'search-results':
         return <SearchResults query={searchQuery} onSearch={handleSearch} />;
-        case 'auth':
+      case 'auth':
         return <Auth />;
+      case 'profile':
+        return isAuthenticated ? <Profile /> : <Auth />;
       case 'home':
       default:
         return <Home onSearch={handleSearch} />;

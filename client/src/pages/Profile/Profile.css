@@ -1,0 +1,116 @@
+.profile-page {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: calc(100vh - 110px);
+    padding: 2rem 1rem;
+    background-color: var(--bg-color);
+  }
+  
+  .profile-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 2rem;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .profile-title {
+    font-size: 1.8rem;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+    text-align: center;
+    transition: color 0.3s ease;
+  }
+  
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+  }
+  
+  .profile-details {
+    text-align: center;
+  }
+  
+  .profile-name {
+    font-size: 1.5rem;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+    transition: color 0.3s ease;
+  }
+  
+  .profile-email {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    opacity: 0.8;
+    transition: color 0.3s ease;
+  }
+  
+  .profile-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .edit-profile-btn, .logout-btn {
+    padding: 0.7rem 1.5rem;
+    border-radius: var(--border-radius-md);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .edit-profile-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+  }
+  
+  .edit-profile-btn:hover {
+    background-color: #3b78e7;
+    transform: translateY(-2px);
+  }
+  
+  .logout-btn {
+    background-color: transparent;
+    color: var(--danger-color, #ea4335);
+    border: 1px solid var(--danger-color, #ea4335);
+  }
+  
+  .logout-btn:hover {
+    background-color: rgba(234, 67, 53, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  @media (max-width: 480px) {
+    .profile-container {
+      padding: 1.5rem;
+    }
+    
+    .profile-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .edit-profile-btn, .logout-btn {
+      width: 100%;
+    }
+  }

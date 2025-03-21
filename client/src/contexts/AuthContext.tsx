@@ -5,6 +5,7 @@
  * Handles user login, signup, logout, and token storage.
  */
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
+import { authApi, ApiError } from '../services/api';
 
 // Define User type
 interface User {
@@ -24,6 +25,7 @@ interface AuthContextType {
   logout: () => void;
   authError: string | null;
   clearAuthError: () => void;
+  loading: boolean;
 }
 
 // Create context with default values
@@ -46,17 +48,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   
   // Check for existing token on initial load
   useEffect(() => {
-    const storedToken = localStorage.getItem('auth_token');
-    const storedUser = localStorage.getItem('auth_user');
+    const verifyToken = async () => {
+      const storedToken = localStorage.getItem('auth_token');
+      
+      if (!storedToken) {
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        // Verify token with backend
+        const data = await authApi.verifyToken(storedToken);
+        
+        // Set authentication state
+        setToken(storedToken);
+        setUser(data.user);
+        setIsAuthenticated(true);
+      } catch (error) {
+        // Token is invalid or expired
+        console.error('Token verification failed:', error);
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
-    }
+    verifyToken();
   }, []);
   
   // Clear authentication error
@@ -67,74 +89,64 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Login function
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // TODO: Replace with actual API call
-      // placeholder
-      console.log('Logging in with:', { email, password });
+      setLoading(true);
+      // Call API login endpoint
+      const data = await authApi.login(email, password);
       
-      // Simulate successful login
-      if (email === 'test@example.com' && password === 'password') {
-        // Mock user and token response
-        const mockUser: User = {
-          id: '123456',
-          username: 'testuser',
-          email: email
-        };
-        const mockToken = 'mock-jwt-token';
-        
-        // Store in localStorage
-        localStorage.setItem('auth_token', mockToken);
-        localStorage.setItem('auth_user', JSON.stringify(mockUser));
-        
-        // Update state
-        setUser(mockUser);
-        setToken(mockToken);
-        setIsAuthenticated(true);
-        setAuthError(null);
-        
-        return true;
-      } else {
-        // Simulate failed login
-        setAuthError('Invalid email or password');
-        return false;
-      }
+      // Store in localStorage
+      localStorage.setItem('auth_token', data.token);
+      localStorage.setItem('auth_user', JSON.stringify(data.user));
+      
+      // Update state
+      setUser(data.user);
+      setToken(data.token);
+      setIsAuthenticated(true);
+      setAuthError(null);
+      
+      return true;
     } catch (error) {
-      setAuthError('An error occurred during login');
+      // Handle API errors
+      if (error instanceof ApiError) {
+        setAuthError(error.message);
+      } else {
+        setAuthError('An unexpected error occurred during login');
+      }
       console.error('Login error:', error);
       return false;
+    } finally {
+      setLoading(false);
     }
   };
   
   // Signup function
   const signup = async (username: string, email: string, password: string): Promise<boolean> => {
     try {
-      // TODO: Replace with actual API call
-      // This is a placeholder for demonstration purposes
-      console.log('Signing up with:', { username, email, password });
-      
-      // Simulate successful signup
-      // In a real app, this would make an API call to create the user
-      const mockUser: User = {
-        id: '123456',
-        username: username,
-        email: email
-      };
-      const mockToken = 'mock-jwt-token';
+      setLoading(true);
+      // Call API signup endpoint
+      const data = await authApi.signup(username, email, password);
       
       // Store in localStorage
-      localStorage.setItem('auth_token', mockToken);
-      localStorage.setItem('auth_user', JSON.stringify(mockUser));
+      localStorage.setItem('auth_token', data.token);
+      localStorage.setItem('auth_user', JSON.stringify(data.user));
       
       // Update state
-      setUser(mockUser);
-      setToken(mockToken);
+      setUser(data.user);
+      setToken(data.token);
       setIsAuthenticated(true);
       setAuthError(null);
       
       return true;
     } catch (error) {
-      setAuthError('An error occurred during signup');
+      // Handle API errors
+      if (error instanceof ApiError) {
+        setAuthError(error.message);
+      } else {
+        setAuthError('An unexpected error occurred during signup');
+      }
       console.error('Signup error:', error);
       return false;
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -160,7 +172,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       signup,
       logout,
       authError,
-      clearAuthError
+      clearAuthError,
+      loading,
     }}>
       {children}
     </AuthContext.Provider>

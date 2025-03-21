@@ -49,6 +49,17 @@
   opacity: 1;
 }
 
+.auth-button:disabled {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.toggle-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .auth-error {
   background-color: rgba(234, 67, 53, 0.1);
   color: var(--danger-color, #ea4335);
