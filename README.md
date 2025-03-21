@@ -15,10 +15,11 @@ The project is organized with a scalable architecture to support future growth:
 
 ```
 /
+├── docs/                    # Project documentation
+│   ├── authentication.md    # Authentication system documentation
+│   ├── search-results-template.md # Search results template documentation
+│   └── README.md            # README for docs
 ├── client/                  # Frontend code
-│   ├── docs/                # Documentation
-│   │   └── search-results-template.md  # Search results template documentation
-│   │   └── README.md        # README for docs
 │   ├── public/              # Static files
 │   │   ├── index.html       # Main HTML file
 │   │   ├── favicon.ico      # Website favicon
@@ -34,11 +35,14 @@ The project is organized with a scalable architecture to support future growth:
 │   │   │   │   └── Footer/  # Footer component
 │   │   │   └── features/    # Feature-specific components
 │   │   ├── contexts/        # React context providers
-│   │   │   └── ThemeContext/  # Theme management context
+│   │   │   ├── AuthContext/ # Authentication management context
+│   │   │   └── ThemeContext/ # Theme management context
 │   │   ├── hooks/           # Custom React hooks
 │   │   ├── pages/           # Page components
 │   │   │   ├── Home/        # Home page
 │   │   │   ├── About/       # About page
+│   │   │   ├── Auth/        # Login/SignUp pages
+│   │   │   ├── Profile/       # Profile page
 │   │   │   └── SearchResults/  # Search results page
 │   │   ├── services/        # API services
 │   │   ├── utils/           # Utility functions
@@ -47,7 +51,13 @@ The project is organized with a scalable architecture to support future growth:
 │   │   └── index.tsx        # Entry point
 │   ├── package.json         # Frontend dependencies
 │   └── tsconfig.json        # TypeScript config
-└── server/                  # Backend code (for future)
+├── backend/                 # Backend code
+│   ├── src/
+│   │   ├── config/          # Configuration files
+│   │   ├── controllers/     # Request handlers
+│   │   ├── middleware/      # Express middleware
+│   │   ├── models/          # Database models
+│   │   └── routes/          # API routes
 ```
 
 ## Getting Started
@@ -56,25 +66,34 @@ The project is organized with a scalable architecture to support future growth:
 
 - Node.js (v14 or later)
 - npm (v6 or later)
+- PostgreSQL (v12 or later)
 
 ### Installation
 
 1. Clone the repository
 2. Navigate to the project directory
-3. Install dependencies:
+3.  Set up the database if not already (see [Authentication Documentation](./docs/AUTHENTICATION.md) for details)
+4. Install dependencies:
 
 ```bash
-cd client
-npm install
+# Install client dependencies
+cd client && npm install
+
+# Install backend dependencies
+cd backend && npm install
 ```
 
-4. Start the development server:
+5. Start the development servers:
 
 ```bash
-npm start
+# Start backend server
+cd backend && npm start
+
+# Start frontend dev server (in a new terminal)
+cd client && npm start
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## Implementation Details
 
@@ -116,10 +135,21 @@ The application includes a search feature that allows users to:
 
 The search results page is currently implemented as a template that will be populated with actual data when the backend is implemented. See the [search results template documentation](client/docs/search-results-template.md) for details on how to use and extend this template.
 
+### Authentication System
+
+The application includes a complete authentication system with:
+
+-   User registration and login
+-   JWT-based authentication
+-   Protected routes
+-   User profiles
+
+For detailed information on the authentication implementation, see the [Authentication Documentation](./docs/AUTHENTICATION.md).
+
+
 ## Future Enhancements
 
 - **Backend API Integration**: Connect to a recipe database API
-- **User Authentication**: Login, registration, and profile management
 - **Recipe Management**: Save favorites, add notes, and customize recipes
 - **Advanced Search**: Filtering by cuisine, cooking time, and difficulty
 - **Meal Planning**: Weekly meal planning and shopping list generation

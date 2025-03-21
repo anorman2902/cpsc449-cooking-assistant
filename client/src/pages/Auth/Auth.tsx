@@ -143,14 +143,6 @@ function Auth() {
                         />
                         </div>
                         
-                        <div className="form-options">
-                        <div className="remember-me">
-                            <input type="checkbox" id="remember" disabled={loading}/>
-                            <label htmlFor="remember">Remember me</label>
-                        </div>
-                        <a href="/forgot-password" className="forgot-password" onClick={(e) => loading && e.preventDefault()}>Forgot password?</a>
-                        </div>
-                        
                         <button type="submit" className="auth-button" disabled={loading}>
                             {loading ? 'Logging in...' : 'Log In'}
                         </button>
@@ -208,13 +200,6 @@ function Auth() {
                             required
                             disabled={loading}
                         />
-                        </div>
-                        
-                        <div className="terms-agreement">
-                        <input type="checkbox" id="terms" required disabled={loading}/>
-                        <label htmlFor="terms">
-                            I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>
-                        </label>
                         </div>
                         
                         <button type="submit" className="auth-button" disabled={loading}>

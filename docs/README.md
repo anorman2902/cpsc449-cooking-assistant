@@ -6,6 +6,8 @@ Welcome to the documentation for the Recipe Search Application. This directory c
 
 - [Search Results Template](./search-results-template.md) - Documentation for the search results page template, including implementation details and future enhancement plans.
 
+- [Authentication](./authentication.md) - Documentation for the authentication implementation, including details for front end and back end and testing.
+
 ## Documentation Structure
 
 The documentation is organized to provide comprehensive information about different aspects of the application:

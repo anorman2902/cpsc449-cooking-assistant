@@ -6,7 +6,7 @@
  */
 
 // Base API URL - Need to update this to match backend
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'http://localhost:3001/api';
 
 /**
  * Get authentication headers for API requests

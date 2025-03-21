@@ -22,7 +22,7 @@ function Profile() {
             </div>
             
             <div className="profile-actions">
-              <button className="edit-profile-btn">Edit Profile</button>
+              {/* <button className="edit-profile-btn">Edit Profile</button> */}
               <button className="logout-btn" onClick={logout}>Log Out</button>
             </div>
           </div>
