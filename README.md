@@ -8,6 +8,8 @@ A lightweight React-based web application that helps users find recipes based on
 - **Search Results Template**: Template page for displaying search results
 - **Clean, Minimalist UI**: Focus on simplicity and ease of use
 - **Responsive Design**: Optimized for all device sizes
+- **Backend API**: REST API for recipes and ingredients
+- **Database Integration**: PostgreSQL storage for recipes and ingredients
 
 ## Project Structure
 
@@ -42,9 +44,10 @@ The project is organized with a scalable architecture to support future growth:
 │   │   │   ├── Home/        # Home page
 │   │   │   ├── About/       # About page
 │   │   │   ├── Auth/        # Login/SignUp pages
-│   │   │   ├── Profile/       # Profile page
+│   │   │   ├── Profile/     # Profile page
 │   │   │   └── SearchResults/  # Search results page
 │   │   ├── services/        # API services
+│   │   │   └── recipeService.ts  # Recipe API service
 │   │   ├── utils/           # Utility functions
 │   │   ├── styles/          # Global styles
 │   │   ├── App.tsx          # Main App component
@@ -54,10 +57,23 @@ The project is organized with a scalable architecture to support future growth:
 ├── backend/                 # Backend code
 │   ├── src/
 │   │   ├── config/          # Configuration files
+│   │   │   └── db.js        # Database configuration
 │   │   ├── controllers/     # Request handlers
+│   │   │   ├── authController.js    # Authentication controller
+│   │   │   └── recipeController.js  # Recipe controller
 │   │   ├── middleware/      # Express middleware
 │   │   ├── models/          # Database models
+│   │   │   ├── Recipe.js            # Recipe model
+│   │   │   ├── Ingredient.js        # Ingredient model
+│   │   │   └── RecipeIngredient.js  # Join table model
 │   │   └── routes/          # API routes
+│   │       ├── authRoutes.js        # Authentication routes
+│   │       └── recipeRoutes.js      # Recipe routes
+│   ├── seeders/             # Database seeders
+│   │   └── recipeSeeder.js  # Recipe and ingredient seeder
+│   ├── .env                 # Environment variables
+│   ├── server.js            # Express server
+│   └── package.json         # Backend dependencies
 ```
 
 ## Getting Started
@@ -68,12 +84,40 @@ The project is organized with a scalable architecture to support future growth:
 - npm (v6 or later)
 - PostgreSQL (v12 or later)
 
+### Database Setup
+
+1. Install PostgreSQL if you haven't already from [the official website](https://www.postgresql.org/download/)
+
+2. Create a new database:
+   ```bash
+   # Connect to PostgreSQL
+   psql -U postgres
+   
+   # Create the database
+   CREATE DATABASE recipe_db;
+   
+   # Exit
+   \q
+   ```
+
+3. Configure database connection:
+   Create a `.env` file in the `backend` directory with the following content:
+   ```
+   PORT=3001
+   DB_USER=postgres
+   DB_PASSWORD=your_postgres_password
+   DB_NAME=recipe_db
+   DB_HOST=localhost
+   DB_PORT=5432
+   JWT_SECRET=your-secret-key-for-jwt-tokens
+   ```
+   Replace `your_postgres_password` with your actual PostgreSQL password.
+
 ### Installation
 
 1. Clone the repository
 2. Navigate to the project directory
-3.  Set up the database if not already (see [Authentication Documentation](./docs/authentication.md) for details)
-4. Install dependencies:
+3. Install dependencies:
 
 ```bash
 # Install client dependencies
@@ -83,17 +127,32 @@ cd client && npm install
 cd backend && npm install
 ```
 
+4. Seed the database with initial recipe data:
+```bash
+cd backend && npm run seed
+```
+
 5. Start the development servers:
 
 ```bash
 # Start backend server
-cd backend && npm start
+cd backend && npm run dev
 
 # Start frontend dev server (in a new terminal)
 cd client && npm start
 ```
 
 6. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## API Endpoints
+
+The backend provides the following API endpoints:
+
+- `GET /api/recipes` - Get all recipes
+- `GET /api/recipes/search/:query` - Search recipes by name or ingredient
+- `GET /api/test` - Test endpoint to check if API is working
+- `POST /api/auth/register` - Register a new user
+- `POST /api/auth/login` - Login an existing user
 
 ## Implementation Details
 
@@ -102,6 +161,9 @@ cd client && npm start
 - **Responsive Design**: Mobile-first approach with responsive layouts
 - **Scalable Project Structure**: Organized for future growth with additional pages and backend
 - **Simple Routing**: State-based routing for navigation between pages
+- **PostgreSQL Database**: Stores recipes, ingredients, and users
+- **RESTful API**: Express.js backend with well-defined endpoints
+- **Sequelize ORM**: Database models and relationships
 
 ## Project Organization
 
@@ -133,7 +195,7 @@ The application includes a search feature that allows users to:
 3. Submit their search query
 4. View search results on a dedicated results page
 
-The search results page is currently implemented as a template that will be populated with actual data when the backend is implemented. See the [search results template documentation](client/docs/search-results-template.md) for details on how to use and extend this template.
+The search results page displays matching recipes from the database based on the search query.
 
 ### Authentication System
 
@@ -146,6 +208,24 @@ The application includes a complete authentication system with:
 
 For detailed information on the authentication implementation, see the [Authentication Documentation](./docs/AUTHENTICATION.md).
 
+## Troubleshooting
+
+If you encounter issues with the application, try the following:
+
+1. **Database Connection Issues**:
+   - Ensure PostgreSQL is running
+   - Verify your database credentials in the `.env` file
+   - Make sure the `recipe_db` database exists
+
+2. **No Recipes Displayed**:
+   - Check if the seeder ran successfully (`npm run seed`)
+   - Check the backend logs for any errors
+   - Ensure the backend server is running on port 3001
+
+3. **Frontend Issues**:
+   - Clear browser cache and reload
+   - Check console for any JavaScript errors
+   - Verify the frontend is configured to connect to http://localhost:3001/api
 
 ## Future Enhancements
 

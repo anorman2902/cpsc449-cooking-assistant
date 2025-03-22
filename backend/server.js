@@ -5,6 +5,7 @@ const { sequelize } = require('./src/models');
 
 // Import routes
 const authRoutes = require('./src/routes/authRoutes');
+const recipeRoutes = require('./src/routes/recipeRoutes');
 
 // Initialize Express app
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.json());
 
 // API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/recipes', recipeRoutes);
 
 // Test route
 app.get('/api/test', (req, res) => {

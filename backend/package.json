@@ -1,7 +1,8 @@
 {
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "seed": "node seeders/recipeSeeder.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

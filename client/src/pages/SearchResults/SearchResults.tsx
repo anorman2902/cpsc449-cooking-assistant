@@ -4,9 +4,10 @@
  * Displays search results based on user queries for ingredients and dietary restrictions.
  * This is a template page that will be populated with actual data when the backend is implemented.
  */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './SearchResults.css';
 import SearchBar from '../../components/common/SearchBar/SearchBar';
+import { searchRecipes, Recipe } from '../../services/recipeService';
 
 interface SearchResultsProps {
   query?: string;
@@ -20,7 +21,32 @@ interface SearchResultsProps {
  * @returns {JSX.Element} - Rendered search results page
  */
 const SearchResults: React.FC<SearchResultsProps> = ({ query = '', onSearch }) => {
-  // This would be replaced with actual API calls when backend is implemented
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch recipes when query changes
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      if (!query.trim()) return;
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const data = await searchRecipes(query);
+        setRecipes(data);
+      } catch (err) {
+        setError('Failed to fetch recipes. Please try again.');
+        console.error('Error fetching recipes:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchRecipes();
+  }, [query]);
+
   const handleNewSearch = (newQuery: string) => {
     onSearch(newQuery);
   };
@@ -38,31 +64,31 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query = '', onSearch }) =
       </div>
 
       <div className="search-results-content">
-        {/* This is a placeholder for the actual search results */}
-        <div className="results-placeholder">
-          <h2>Recipe Results Template</h2>
-          <p className="placeholder-description">
-            This is a template for the search results page. When the backend is implemented, 
-            this area will display recipe cards based on the user's search query.
-          </p>
-          
-          <div className="mock-results-grid">
-            {/* Example of how recipe cards would be structured */}
-            {[1, 2, 3, 4, 5, 6].map((item) => (
-              <div key={item} className="recipe-card-placeholder">
+        {loading ? (
+          <div className="loading-indicator">Loading recipes...</div>
+        ) : error ? (
+          <div className="error-message">{error}</div>
+        ) : recipes.length === 0 ? (
+          <div className="no-results">
+            <p>No recipes found matching "{query}"</p>
+          </div>
+        ) : (
+          <div className="results-grid">
+            {recipes.map((recipe) => (
+              <div key={recipe.id} className="recipe-card">
                 <div className="recipe-image-placeholder"></div>
-                <div className="recipe-info-placeholder">
-                  <div className="recipe-title-placeholder"></div>
-                  <div className="recipe-details-placeholder">
-                    <div className="recipe-time-placeholder"></div>
-                    <div className="recipe-rating-placeholder"></div>
-                  </div>
-                  <div className="recipe-ingredients-placeholder"></div>
+                <div className="recipe-info">
+                  <h3 className="recipe-title">{recipe.title}</h3>
+                  {recipe.Ingredients && recipe.Ingredients.length > 0 && (
+                    <div className="recipe-ingredients">
+                      <p>Ingredients: {recipe.Ingredients.map(i => i.name).join(', ')}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        )}
       </div>
 
       <div className="search-results-filters">

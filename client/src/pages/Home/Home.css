@@ -1,90 +1,135 @@
+/* Home Page Styling */
 .home-page {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  min-height: calc(100vh - 120px); /* Account for header/footer */
 }
 
 .main-content {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding-top: 0;
-  margin-top: -2rem; /* Adjust this to move the hero section up */
+  padding: 2rem 1rem;
 }
 
-/* Hero Section */
+/* Hero Section Styling */
 .hero-section {
-  background-color: var(--card-bg, #fff);
-  padding: 2rem;
   text-align: center;
   width: 100%;
   max-width: 800px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh; /* Reduced from 60vh to make it more centered */
-  border-radius: var(--border-radius-lg, 12px);
-  box-shadow: var(--shadow-md, 0 4px 8px rgba(0, 0, 0, 0.12));
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 3rem;
 }
 
 .hero-title {
   font-size: 3rem;
   margin-bottom: 1rem;
-  color: var(--text-color, #333);
-  transition: color 0.3s ease;
+  color: #333;
 }
 
 .hero-subtitle {
-  font-size: 1.4rem;
-  color: var(--text-color, #666);
-  opacity: 0.8;
-  max-width: 700px;
-  margin: 0 auto 1.5rem;
-  transition: color 0.3s ease;
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #666;
 }
 
-/* Mobile responsiveness */
+/* Available Recipes Section */
+.available-recipes {
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 2rem;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.recipes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.recipe-card {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: #fff;
+}
+
+.recipe-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.recipe-image-placeholder {
+  height: 180px;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recipe-info {
+  padding: 1.5rem;
+}
+
+.recipe-title {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.recipe-ingredients {
+  margin-top: 0.5rem;
+}
+
+.ingredients-label {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.ingredients-list {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.loading-indicator, .error-message, .no-recipes {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.error-message {
+  color: #d9534f;
+}
+
+/* Responsive Styling */
 @media (max-width: 768px) {
-  .main-content {
-    margin-top: -1.5rem;
-  }
-  
-  .hero-section {
-    padding: 1.5rem;
-    min-height: 45vh;
-  }
-  
   .hero-title {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
   }
   
-  .hero-subtitle {
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
+  .recipes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
   }
 }
 
-/* Small mobile devices */
 @media (max-width: 480px) {
-  .main-content {
-    margin-top: -1rem;
-  }
-  
-  .hero-section {
-    padding: 1rem;
-    min-height: 40vh;
-  }
-  
   .hero-title {
-    font-size: 1.8rem;
+    font-size: 2rem;
   }
   
   .hero-subtitle {
     font-size: 1rem;
-    margin-bottom: 1.2rem;
+  }
+  
+  .recipes-grid {
+    grid-template-columns: 1fr;
   }
 } 

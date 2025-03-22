@@ -1,39 +1,52 @@
-# Recipe Search Application Documentation
+# Documentation
 
-Welcome to the documentation for the Recipe Search Application. This directory contains detailed information about the application's components, templates, and future development plans.
+This directory contains comprehensive documentation for the Recipe Search Application.
 
 ## Available Documentation
 
-- [Search Results Template](./search-results-template.md) - Documentation for the search results page template, including implementation details and future enhancement plans.
+- [Getting Started Guide](getting-started.md) - A guide for new developers to set up the project
+- [Database Setup](database-setup.md) - Instructions for setting up and configuring PostgreSQL
+- [API Documentation](api-documentation.md) - Details of all API endpoints and how to use them
+- [Authentication Documentation](authentication.md) - Information about the authentication system
+- [Search Results Template](search-results-template.md) - Documentation for the search results page template
 
-- [Authentication](./authentication.md) - Documentation for the authentication implementation, including details for front end and back end and testing.
+## Project Overview
 
-## Documentation Structure
+The Recipe Search Application is a full-stack web application built with:
 
-The documentation is organized to provide comprehensive information about different aspects of the application:
+- Frontend: React (TypeScript)
+- Backend: Express.js (Node.js)
+- Database: PostgreSQL (Sequelize ORM)
 
-1. **Template Documentation**: Detailed guides on how to use and extend the templates in the application.
-2. **Component Documentation**: Information about reusable components and how to use them.
-3. **Future Plans**: Documentation about planned enhancements and features.
+The application allows users to search for recipes based on available ingredients, view recipe details, and (in the future) save their favorite recipes.
 
-## How to Use This Documentation
+## Key Features
 
-- If you're looking to understand how to implement the backend for the search results page, start with the [Search Results Template](./search-results-template.md) documentation.
-- For general project structure and organization, refer to the main [README.md](../README.md) in the project root.
+- Search recipes by name or ingredient
+- View recipe details including ingredients
+- User authentication (registration and login)
+- Responsive design for all device sizes
 
-## Contributing to Documentation
+## Architecture
 
-When adding new features or components to the application, please consider adding corresponding documentation:
+The application follows a standard client-server architecture:
 
-1. Create a new Markdown file in this directory with a descriptive name.
-2. Follow the existing documentation format for consistency.
-3. Update this index file to include a link to your new documentation.
-4. Include code examples and usage instructions where appropriate.
+- **Client**: React frontend serving the user interface
+- **API Server**: Express.js backend providing REST endpoints
+- **Database**: PostgreSQL storing recipes, ingredients, and user data
 
-## Documentation Best Practices
+## Setup Quick Reference
 
-- Use clear, concise language
-- Include code examples for implementation
-- Provide visual aids (diagrams, screenshots) when helpful
-- Keep documentation up-to-date with code changes
-- Cross-reference related documentation 
+1. Install prerequisites (Node.js, PostgreSQL)
+2. Clone the repository
+3. Set up PostgreSQL database (`recipe_db`)
+4. Configure environment variables in `.env`
+5. Install dependencies (`npm install` in both client and backend directories)
+6. Seed the database (`npm run seed` in backend directory)
+7. Start development servers (`npm run dev` for backend, `npm start` for client)
+
+For detailed setup instructions, see the [Getting Started Guide](getting-started.md).
+
+## Contact
+
+For questions or help, please contact the project maintainers. 
