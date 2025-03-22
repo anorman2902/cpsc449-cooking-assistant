@@ -65,12 +65,15 @@ The project is organized with a scalable architecture to support future growth:
 │   │   ├── models/          # Database models
 │   │   │   ├── Recipe.js            # Recipe model
 │   │   │   ├── Ingredient.js        # Ingredient model
-│   │   │   └── RecipeIngredient.js  # Join table model
+│   │   │   ├── RecipeIngredient.js  # Join table model
+│   │   │   ├── ShoppingList.js      # Shopping list model
+│   │   │   └── User.js              # User model
 │   │   └── routes/          # API routes
 │   │       ├── authRoutes.js        # Authentication routes
 │   │       └── recipeRoutes.js      # Recipe routes
 │   ├── seeders/             # Database seeders
-│   │   └── recipeSeeder.js  # Recipe and ingredient seeder
+│   │   └── tempSeed.js      # Main seed file with complete test data
+│   ├── migrations/          # Database migrations
 │   ├── .env                 # Environment variables
 │   ├── server.js            # Express server
 │   └── package.json         # Backend dependencies
@@ -131,6 +134,13 @@ cd backend && npm install
 ```bash
 cd backend && npm run seed
 ```
+
+This will populate your database with:
+- Sample users
+- Common ingredients (eggs, pasta, chicken, etc.)
+- Several recipes (Spaghetti Carbonara, Chicken Rice Bowl, etc.)
+- Recipe-ingredient relationships
+- Sample shopping list items
 
 5. Start the development servers:
 

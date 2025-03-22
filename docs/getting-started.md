@@ -126,7 +126,7 @@ Key files to understand:
 - `server.js` - Express application entry point
 - `src/models/Recipe.js` - Recipe database model
 - `src/controllers/recipeController.js` - Recipe API controllers
-- `seeders/recipeSeeder.js` - Database seed script
+- `seeders/tempSeed.js` - Database seed script
 
 ## Development Workflow
 

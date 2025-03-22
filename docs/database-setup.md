@@ -121,7 +121,7 @@ cd backend
 npm run seed
 ```
 
-This command executes the `recipeSeeder.js` script, which creates:
+This command executes the `tempSeed.js` script, which creates:
 - 12 sample ingredients (Chicken, Rice, Tomato, etc.)
 - 6 sample recipes (Classic Spaghetti, Chicken Rice Bowl, etc.)
 - Relationships between recipes and their ingredients
