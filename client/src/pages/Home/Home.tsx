@@ -50,7 +50,7 @@ function Home({ onSearch }: HomeProps) {
       <main className="main-content">
         {/* Simple search interface with hero section */}
         <div className="hero-section">
-          <h1 className="hero-title">Recipe Finder</h1>
+          <h1 className="hero-title">Name Here</h1>
           <p className="hero-subtitle">
             Enter ingredients you have, and we'll show you what you can cook!
           </p>
