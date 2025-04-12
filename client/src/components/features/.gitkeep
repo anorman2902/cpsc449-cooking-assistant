@@ -1,0 +1,8 @@
+# This directory is for feature-specific components
+# 
+# Feature components are more complex and tied to specific application features
+# Examples that might be added here:
+# - RecipeDetails
+# - ShoppingList
+# - MealPlanner
+# - UserPreferences 

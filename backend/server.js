@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 const { sequelize } = require('./src/models');
 
@@ -14,6 +15,12 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+/**
+ * Static File Serving
+ * For detailed image handling documentation, see: /docs/image-handling.md
+ */
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 // API routes
 app.use('/api/auth', authRoutes);

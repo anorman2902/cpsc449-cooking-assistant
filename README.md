@@ -6,10 +6,21 @@ A lightweight React-based web application that helps users find recipes based on
 
 - **Recipe Search**: Search for recipes based on available ingredients
 - **Search Results Template**: Template page for displaying search results
+- **Recipe Details**: Detailed view of recipes with ingredients, preparation steps, and metadata
+- **Dark Mode Support**: Accessibility-friendly dark mode for all pages
 - **Clean, Minimalist UI**: Focus on simplicity and ease of use
 - **Responsive Design**: Optimized for all device sizes
 - **Backend API**: REST API for recipes and ingredients
 - **Database Integration**: PostgreSQL storage for recipes and ingredients
+- **Recipe Images**: AI-generated images for recipes stored locally
+
+## Documentation
+
+Comprehensive documentation is available in the `/docs` directory:
+- [Image Handling Documentation](/docs/image-handling.md) - Complete guide for recipe images
+- [Authentication Documentation](/docs/authentication.md) - User authentication system
+- [Search Results Template](/docs/search-results-template.md) - Usage guide for search results
+- [Recipe Framework](/docs/recipe-framework.md) - Guide for using the recipe framework for new recipes
 
 ## Project Structure
 
@@ -20,13 +31,16 @@ The project is organized with a scalable architecture to support future growth:
 ├── docs/                    # Project documentation
 │   ├── authentication.md    # Authentication system documentation
 │   ├── search-results-template.md # Search results template documentation
+│   ├── recipe-framework.md  # Recipe framework documentation
 │   └── README.md            # README for docs
 ├── client/                  # Frontend code
 │   ├── public/              # Static files
 │   │   ├── index.html       # Main HTML file
 │   │   ├── favicon.ico      # Website favicon
 │   │   ├── manifest.json    # Web app manifest for PWA support
-│   │   └── robots.txt       # Instructions for web crawlers
+│   │   ├── robots.txt       # Instructions for web crawlers
+│   │   └── images/          # Static image files
+│   │       └── recipes/     # Recipe images (AI-generated)
 │   ├── src/
 │   │   ├── assets/          # Images, fonts, etc.
 │   │   ├── components/      # Reusable UI components
@@ -36,6 +50,7 @@ The project is organized with a scalable architecture to support future growth:
 │   │   │   │   ├── Navbar/  # Navigation bar component
 │   │   │   │   └── Footer/  # Footer component
 │   │   │   └── features/    # Feature-specific components
+│   │   │       └── RecipeCard/  # Reusable recipe card component
 │   │   ├── contexts/        # React context providers
 │   │   │   ├── AuthContext/ # Authentication management context
 │   │   │   └── ThemeContext/ # Theme management context
@@ -45,6 +60,7 @@ The project is organized with a scalable architecture to support future growth:
 │   │   │   ├── About/       # About page
 │   │   │   ├── Auth/        # Login/SignUp pages
 │   │   │   ├── Profile/     # Profile page
+│   │   │   ├── RecipeDetails/  # Recipe details page
 │   │   │   └── SearchResults/  # Search results page
 │   │   ├── services/        # API services
 │   │   │   └── recipeService.ts  # Recipe API service
@@ -159,6 +175,7 @@ cd client && npm start
 The backend provides the following API endpoints:
 
 - `GET /api/recipes` - Get all recipes
+- `GET /api/recipes/:id` - Get a specific recipe by ID
 - `GET /api/recipes/search/:query` - Search recipes by name or ingredient
 - `GET /api/test` - Test endpoint to check if API is working
 - `POST /api/auth/register` - Register a new user
@@ -246,4 +263,8 @@ If you encounter issues with the application, try the following:
 - **Personalization**: Recommendations based on user preferences and history
 - **Social Features**: Share recipes and follow other users
 
-For detailed information about planned enhancements to the search results page, see the [search results template documentation](client/docs/search-results-template.md).
+For detailed information about planned enhancements to the search results page, see the [Search Results Template](/docs/search-results-template.md).
+
+## Image Handling
+
+Recipe images are managed through a standardized process. For complete details, see [Image Handling Documentation](/docs/image-handling.md).

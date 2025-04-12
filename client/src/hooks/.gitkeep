@@ -1,0 +1,8 @@
+# This directory is for custom React hooks
+# 
+# Custom hooks are a way to reuse stateful logic across components
+# Examples that might be added here:
+# - useRecipeSearch - Hook for searching recipes
+# - useAuth - Hook for authentication state
+# - useLocalStorage - Hook for persistent local storage
+# - useWindowSize - Hook for responsive design 

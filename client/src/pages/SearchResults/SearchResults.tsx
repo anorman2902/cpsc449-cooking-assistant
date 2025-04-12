@@ -1,26 +1,25 @@
 /**
  * Search Results Page Component
- * 
- * Displays search results based on user queries for ingredients and dietary restrictions.
- * This is a template page that will be populated with actual data when the backend is implemented.
  */
 import React, { useState, useEffect } from 'react';
 import './SearchResults.css';
 import SearchBar from '../../components/common/SearchBar/SearchBar';
+import RecipeCard from '../../components/features/RecipeCard';
 import { searchRecipes, Recipe } from '../../services/recipeService';
 
 interface SearchResultsProps {
   query?: string;
   onSearch: (query: string) => void;
+  onRecipeSelect: (recipeId: string) => void;
 }
 
 /**
  * SearchResults component - Displays recipe search results
  * 
- * @param {SearchResultsProps} props - Component props
- * @returns {JSX.Element} - Rendered search results page
+ * Shows filtered recipes based on search query.
+ * Uses the shared RecipeCard component for consistent recipe display.
  */
-const SearchResults: React.FC<SearchResultsProps> = ({ query = '', onSearch }) => {
+const SearchResults: React.FC<SearchResultsProps> = ({ query = '', onSearch, onRecipeSelect }) => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,17 +74,11 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query = '', onSearch }) =
         ) : (
           <div className="results-grid">
             {recipes.map((recipe) => (
-              <div key={recipe.id} className="recipe-card">
-                <div className="recipe-image-placeholder"></div>
-                <div className="recipe-info">
-                  <h3 className="recipe-title">{recipe.title}</h3>
-                  {recipe.Ingredients && recipe.Ingredients.length > 0 && (
-                    <div className="recipe-ingredients">
-                      <p>Ingredients: {recipe.Ingredients.map(i => i.name).join(', ')}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <RecipeCard
+                key={recipe.id}
+                recipe={recipe}
+                onClick={onRecipeSelect}
+              />
             ))}
           </div>
         )}

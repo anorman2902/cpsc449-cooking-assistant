@@ -4,9 +4,11 @@
  * A reusable search input component that allows users to enter search queries
  * for finding recipes based on ingredients. Handles form submission and keyboard
  * events for a smooth user experience.
+ * Supports dark mode for better accessibility.
  */
 import React, { useState, useEffect } from 'react';
 import './SearchBar.css';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 /**
  * Props interface for the SearchBar component
@@ -27,6 +29,7 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch, initialQuery = '' }) => {
   // State to track the current search input value
   const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const { theme } = useTheme();
   
   // Update searchQuery when initialQuery changes
   useEffect(() => {
@@ -60,7 +63,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, initialQuery = '' }) =>
   };
 
   return (
-    <div className="search-container">
+    <div className={`search-container ${theme === 'dark' ? 'theme-dark' : ''}`}>
       <form onSubmit={handleSubmit} className="search-form">
         <input
           type="text"

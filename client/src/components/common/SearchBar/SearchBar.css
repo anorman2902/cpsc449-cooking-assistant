@@ -1,3 +1,23 @@
+/* SearchBar component styles */
+
+/* Light mode (default) variables */
+:root {
+  --search-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --search-shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.18);
+  --search-input-bg: white;
+  --search-input-text: #333;
+  --search-input-placeholder: rgba(51, 51, 51, 0.6);
+}
+
+/* Dark mode variables */
+.theme-dark {
+  --search-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --search-shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.35);
+  --search-input-bg: #333333;
+  --search-input-text: #e0e0e0;
+  --search-input-placeholder: rgba(224, 224, 224, 0.7);
+}
+
 .search-container {
   width: 100%;
   max-width: 700px;
@@ -8,7 +28,7 @@
 .search-form {
   display: flex;
   position: relative;
-  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.15));
+  box-shadow: var(--search-shadow-md);
   border-radius: 50px;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -16,7 +36,7 @@
 
 .search-form:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg, 0 6px 16px rgba(0, 0, 0, 0.18));
+  box-shadow: var(--search-shadow-lg);
 }
 
 .search-input {
@@ -26,8 +46,8 @@
   border: none;
   outline: none;
   border-radius: 50px;
-  background-color: var(--input-bg, white);
-  color: var(--input-text, #333);
+  background-color: var(--search-input-bg);
+  color: var(--search-input-text);
   transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
   -webkit-appearance: none;
 }
@@ -38,8 +58,7 @@
 }
 
 .search-input::placeholder {
-  color: var(--input-text, #333);
-  opacity: 0.6;
+  color: var(--search-input-placeholder);
 }
 
 /* Mobile responsiveness */

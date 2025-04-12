@@ -1,14 +1,32 @@
 # Documentation
 
-This directory contains comprehensive documentation for the Recipe Search Application.
+This directory contains comprehensive documentation for the Recipe Finder application.
 
 ## Available Documentation
 
-- [Getting Started Guide](getting-started.md) - A guide for new developers to set up the project
-- [Database Setup](database-setup.md) - Instructions for setting up and configuring PostgreSQL
-- [API Documentation](api-documentation.md) - Details of all API endpoints and how to use them
-- [Authentication Documentation](authentication.md) - Information about the authentication system
-- [Search Results Template](search-results-template.md) - Documentation for the search results page template
+| Document | Description |
+|----------|-------------|
+| [image-handling.md](image-handling.md) | Complete guide for managing recipe images throughout the application |
+| [authentication.md](authentication.md) | Details on the authentication system implementation |
+| [search-results-template.md](search-results-template.md) | Usage guide for the search results template |
+
+## How to Use This Documentation
+
+Each document is self-contained and focuses on a specific aspect of the application. The documents include:
+
+- Conceptual explanations
+- Implementation details
+- Code examples
+- Configuration guidelines
+- Troubleshooting tips
+
+## Maintaining Documentation
+
+When updating the application, please ensure the documentation is kept up-to-date:
+
+1. When making significant changes to a feature, update the corresponding documentation
+2. Keep code examples current with the actual implementation
+3. Add new documentation files for new major features
 
 ## Project Overview
 

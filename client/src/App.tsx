@@ -11,6 +11,7 @@ import About from './pages/About';
 import SearchResults from './pages/SearchResults';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
+import RecipeDetails from './pages/RecipeDetails';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
@@ -19,6 +20,7 @@ const AppContent = () => {
   // State management
   const [currentPage, setCurrentPage] = useState('home'); // Track current page
   const [searchQuery, setSearchQuery] = useState(''); // Store the current search query
+  const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Store selected recipe ID
 
   // Get auth context
   const { isAuthenticated, loading } = useAuth();
@@ -39,8 +41,17 @@ const AppContent = () => {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setCurrentPage('search-results'); // Navigate to search results page
-    console.log('Searching for:', query);
-    // In a real app, this would make an API call to the backend
+  };
+
+  // Handle recipe selection
+  const handleRecipeSelect = (recipeId: string) => {
+    setSelectedRecipeId(recipeId);
+    setCurrentPage('recipe-details'); // Navigate to recipe details page
+  };
+
+  // Handle back navigation from recipe details
+  const handleBackFromRecipeDetails = () => {
+    setCurrentPage('home'); // Or keep track of previous page and go back there
   };
 
   // Simple routing function
@@ -54,14 +65,18 @@ const AppContent = () => {
       case 'about':
         return <About />;
       case 'search-results':
-        return <SearchResults query={searchQuery} onSearch={handleSearch} />;
+        return <SearchResults query={searchQuery} onSearch={handleSearch} onRecipeSelect={handleRecipeSelect} />;
       case 'auth':
         return <Auth />;
       case 'profile':
         return isAuthenticated ? <Profile /> : <Auth />;
+      case 'recipe-details':
+        return selectedRecipeId ? 
+          <RecipeDetails recipeId={selectedRecipeId} onBack={handleBackFromRecipeDetails} /> : 
+          <Home onSearch={handleSearch} onRecipeSelect={handleRecipeSelect} />;
       case 'home':
       default:
-        return <Home onSearch={handleSearch} />;
+        return <Home onSearch={handleSearch} onRecipeSelect={handleRecipeSelect} />;
     }
   };
 

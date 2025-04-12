@@ -50,8 +50,7 @@ function Auth() {
         const success = await login(loginEmail, loginPassword);
         
         if (success) {
-        console.log('Login successful!');
-        // The context will update isAuthenticated, and user will be redirected
+          // The context will update isAuthenticated, and user will be redirected
         }
     };
 
@@ -82,8 +81,7 @@ function Auth() {
         const success = await signup(username, signupEmail, signupPassword);
         
         if (success) {
-        console.log('Signup successful!');
-        // The context will update isAuthenticated, and user will be redirected
+          // The context will update isAuthenticated, and user will be redirected
         }
     };
 

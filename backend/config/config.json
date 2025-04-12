@@ -1,24 +1,24 @@
 {
   "development": {
     "username": "postgres",
-    "password": "350015",
-    "database": "smart_cooking",
+    "password": "password",
+    "database": "recipe_db",
     "host": "localhost",
     "port": 5432,
     "dialect": "postgres"
   },
   "test": {
     "username": "postgres",
-    "password": "350015",
-    "database": "smart_cooking_test",
+    "password": "password",
+    "database": "recipe_db_test",
     "host": "localhost",
     "port": 5432,
     "dialect": "postgres"
   },
   "production": {
     "username": "postgres",
-    "password": "350015",
-    "database": "smart_cooking_prod",
+    "password": "password",
+    "database": "recipe_db_prod",
     "host": "localhost",
     "port": 5432,
     "dialect": "postgres"

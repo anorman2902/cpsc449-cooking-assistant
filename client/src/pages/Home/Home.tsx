@@ -1,32 +1,33 @@
 /**
  * Home Page Component
- * 
- * Main landing page for the application that displays the search interface.
  */
 import React, { useState, useEffect } from 'react';
 import './Home.css';
 import SearchBar from '../../components/common/SearchBar/SearchBar';
+import RecipeCard from '../../components/features/RecipeCard';
 import { getAllRecipes, Recipe } from '../../services/recipeService';
+import { useTheme } from '../../contexts/ThemeContext';
 
 /**
  * Props interface for the Home component
- * @property {function} onSearch - Callback function that receives the search query
  */
 interface HomeProps {
   onSearch: (query: string) => void;
+  onRecipeSelect: (recipeId: string) => void;
 }
 
 /**
  * Home component - Main landing page
- * Manages search functionality and displays the hero section
  * 
- * @param {HomeProps} props - Component props
- * @returns {JSX.Element} - Rendered home page
+ * Displays the search interface and available recipes.
+ * Uses the shared RecipeCard component for consistent recipe display.
+ * Supports dark mode for better accessibility.
  */
-function Home({ onSearch }: HomeProps) {
+function Home({ onSearch, onRecipeSelect }: HomeProps) {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { theme } = useTheme();
 
   // Fetch all recipes on component mount
   useEffect(() => {
@@ -46,7 +47,7 @@ function Home({ onSearch }: HomeProps) {
   }, []);
 
   return (
-    <div className="home-page">
+    <div className={`home-page ${theme === 'dark' ? 'theme-dark' : ''}`}>
       <main className="main-content">
         {/* Simple search interface with hero section */}
         <div className="hero-section">
@@ -55,7 +56,6 @@ function Home({ onSearch }: HomeProps) {
             Enter ingredients you have, and we'll show you what you can cook!
           </p>
           
-          {/* Simple search bar component */}
           <SearchBar onSearch={onSearch} />
         </div>
 
@@ -74,18 +74,11 @@ function Home({ onSearch }: HomeProps) {
           ) : (
             <div className="recipes-grid">
               {recipes.map((recipe) => (
-                <div key={recipe.id} className="recipe-card">
-                  <div className="recipe-image-placeholder"></div>
-                  <div className="recipe-info">
-                    <h3 className="recipe-title">{recipe.title}</h3>
-                    {recipe.Ingredients && recipe.Ingredients.length > 0 && (
-                      <div className="recipe-ingredients">
-                        <p className="ingredients-label">Ingredients:</p>
-                        <p className="ingredients-list">{recipe.Ingredients.map(i => i.name).join(', ')}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <RecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  onClick={onRecipeSelect}
+                />
               ))}
             </div>
           )}
