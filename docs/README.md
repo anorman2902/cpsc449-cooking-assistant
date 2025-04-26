@@ -9,6 +9,7 @@ This directory contains comprehensive documentation for the Recipe Finder applic
 | [image-handling.md](image-handling.md) | Complete guide for managing recipe images throughout the application |
 | [authentication.md](authentication.md) | Details on the authentication system implementation |
 | [search-results-template.md](search-results-template.md) | Usage guide for the search results template |
+| [database-setup.md](database-setup.md) | Comprehensive guide for setting up, migrating, and seeding the PostgreSQL database |
 
 ## How to Use This Documentation
 

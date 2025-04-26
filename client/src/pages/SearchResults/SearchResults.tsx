@@ -83,39 +83,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query = '', onSearch, onR
           </div>
         )}
       </div>
-
-      <div className="search-results-filters">
-        <h3>Future Filter Options</h3>
-        <div className="filter-section">
-          <h4>Dietary Restrictions</h4>
-          <ul className="filter-options">
-            <li>Vegetarian</li>
-            <li>Vegan</li>
-            <li>Gluten-Free</li>
-            <li>Dairy-Free</li>
-            <li>Nut-Free</li>
-          </ul>
-        </div>
-        <div className="filter-section">
-          <h4>Meal Type</h4>
-          <ul className="filter-options">
-            <li>Breakfast</li>
-            <li>Lunch</li>
-            <li>Dinner</li>
-            <li>Snack</li>
-            <li>Dessert</li>
-          </ul>
-        </div>
-        <div className="filter-section">
-          <h4>Cooking Time</h4>
-          <ul className="filter-options">
-            <li>Under 15 minutes</li>
-            <li>15-30 minutes</li>
-            <li>30-60 minutes</li>
-            <li>Over 60 minutes</li>
-          </ul>
-        </div>
-      </div>
     </div>
   );
 };

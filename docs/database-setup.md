@@ -190,6 +190,19 @@ The application uses the following database models:
    - Check your PostgreSQL role permissions
    - Verify file permissions for the seeder script
 
+4. **Duplicate key value errors**
+   - This typically happens when running seeders multiple times, as the seeder uses fixed UUIDs
+   - To fix this, you need to reset the database completely with:
+     ```bash
+     # From the backend directory
+     npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate && npm run seed
+     ```
+   - This command drops the database, recreates it, runs all migrations, and then seeds it with fresh data
+
+5. **Incomplete seeding**
+   - If seeding stops midway due to errors, the database may be in an inconsistent state
+   - Use the reset command above to ensure a clean database state
+
 ## Viewing Database Content
 
 You can use a database management tool like [pgAdmin](https://www.pgadmin.org/) or [DBeaver](https://dbeaver.io/) to view and manage your PostgreSQL database.
