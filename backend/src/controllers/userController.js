@@ -8,9 +8,9 @@ exports.getFavorites = async (req, res) => {
     const user = await User.findByPk(userId, {
       include: [{
         model: Recipe,
-        as: 'FavoriteRecipes', // Use alias defined in the association
-        attributes: ['id', 'title', 'image_url'],
-        through: { attributes: [] } // Don't include junction table attributes
+        as: 'FavoriteRecipes', 
+        attributes: ['id', 'title', 'image_url', 'user_id', 'source_recipe_id' ],
+        through: { attributes: [] },
       }]
     });
 

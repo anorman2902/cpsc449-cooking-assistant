@@ -10,10 +10,16 @@ import { Recipe } from '../../../services/recipeService';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { favoriteApi } from '../../../services/userService';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart as fasHeart, faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons'; // Solid heart, pencil
+import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons'; // Regular (empty) heart
+import { copyRecipeForUser, deleteMyRecipe } from '../../../services/recipeService';
 
 interface RecipeCardProps {
-  recipe: Recipe;
+  recipe: Recipe & { user_id?: string; source_recipe_id?: string | null }; 
   onClick: (recipeId: string) => void;
+  pageContext?: 'home' | 'search' | 'my-recipes' | 'details';
+  onRecipeDeleted?: (recipeId: string) => void; // callback for delete
 }
 
 /**
@@ -25,7 +31,7 @@ interface RecipeCardProps {
  * - Clickable to view recipe details
  * - Displays recipe image, title and ingredients
  */
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick, pageContext = 'home', onRecipeDeleted }) => {
   const { theme } = useTheme();
   const { token, isAuthenticated, favoriteIds, addFavoriteId, removeFavoriteId, user } = useAuth();
 
@@ -34,7 +40,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
   // Local state for loading status of the favorite action
   const [favLoading, setFavLoading] = useState(false);
 
-  // Update local isFavorited state whenever the global favoriteIds set changes
+  const [copyLoading, setCopyLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   useEffect(() => {
     if (isAuthenticated && favoriteIds) {
       setIsFavorited(favoriteIds.has(recipe.id));
@@ -47,7 +55,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
     onClick(recipe.id);
   };
 
-  // --- Updated Favorite Click Handler ---
+  // Favorite Click Handler
   const handleFavoriteToggle = async (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click navigation
 
@@ -79,6 +87,75 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
       setFavLoading(false); // Finish loading state
     }
   };
+
+  // Handle Copy Click
+  const handleCopyClick = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+
+    if (!isAuthenticated || !token) {
+        alert('Please log in to copy recipes.');
+        // onNavigate('auth'); // Optional redirect
+        return;
+    }
+
+    // Confirmation Pop-up
+    const confirmCopy = window.confirm(`Create your own customizable copy of "${recipe.title}"?`);
+    if (!confirmCopy) {
+        return;
+    }
+
+    setCopyLoading(true);
+    try {
+        const result = await copyRecipeForUser(recipe.id, token);
+        addFavoriteId(result.newRecipeId);
+        alert(`Recipe copied! You can now customize it in your collection.`);
+        // TODO: Optionally navigate to the new recipe details or an edit page
+        // Example: onClick(result.newRecipeId); // Navigate to the new copy's details
+        // Example: onNavigate(`/edit-recipe/${result.newRecipeId}`); // Navigate to edit page (requires routing)
+
+    } catch (error) {
+        console.error('Failed to copy recipe', error);
+        alert('Could not copy recipe. Please try again.');
+    } finally {
+        setCopyLoading(false);
+    }
+  };
+
+  // Handle Delete Click
+  const handleDeleteClick = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+
+    if (!isAuthenticated || !token || !user || user.id !== recipe.user_id) {
+        alert('You can only delete your own recipes.');
+        return;
+    }
+
+    const confirmDelete = window.confirm(`Are you sure you want to delete "${recipe.title}"? This cannot be undone.`);
+    if (!confirmDelete) {
+        return;
+    }
+
+    setDeleteLoading(true);
+    try {
+        await deleteMyRecipe(recipe.id, token);
+        // Alert user
+        alert('Recipe deleted successfully.');
+        // Remove from local favorite state if it was favorited
+        removeFavoriteId(recipe.id);
+        // Tell the parent page (MyRecipes) to remove this card from its list
+        if (onRecipeDeleted) {
+            onRecipeDeleted(recipe.id);
+        }
+    } catch (error) {
+        console.error('Failed to delete recipe', error);
+        alert('Could not delete recipe. Please try again.');
+    } finally {
+        setDeleteLoading(false);
+    }
+  };
+
+  // Determine if the delete button should be shown (owned by user, on My Recipes page)
+  const showDelete = pageContext === 'my-recipes' && isAuthenticated && user?.id === recipe.user_id;
   
   return (
     <div
@@ -107,30 +184,109 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
             <span>{recipe.total_time} min</span>
           </div>
         )}
-        {/*Favorite Button*/}
-        {isAuthenticated && ( // Only if logged in
-          <button
-            onClick={handleFavoriteToggle}
-            style={{
-              marginTop: "10px",
-              cursor: favLoading ? "wait" : "pointer",
-              alignSelf: "flex-start",
-              background: "none",
-              border: 'none', 
-              padding: '5px', 
-              fontSize: '1.5rem', 
-              lineHeight: '1', 
-              color: isFavorited ? 'red' : 'grey'
-            }}
-            disabled={favLoading} 
-            aria-label={isFavorited ? `Remove ${recipe.title} from favorites` : `Add ${recipe.title} to favorites`}
-          >
-            {isFavorited ? '❤️' : '♡'}
-          </button>
-        )}
+        {/* --- Wrapper for Action Buttons --- */}
+        <div
+          style={{
+            display: "flex", // Use flexbox for horizontal layout
+            gap: "10px", // Space between buttons
+            marginTop: "auto", // Push buttons to the bottom
+            paddingTop: "10px", // Add some space above buttons
+            alignItems: "center", // Vertically align icons
+          }}
+        >
+          {/*Favorite Button*/}
+          {isAuthenticated && ( // Only if logged in
+            <button
+              onClick={handleFavoriteToggle}
+              style={{
+                cursor: favLoading ? "wait" : "pointer",
+                alignSelf: "flex-start",
+                background: "none",
+                border: "none",
+                padding: "5px",
+                fontSize: "1.5rem",
+                lineHeight: "1",
+                color: isFavorited ? "red" : "grey",
+              }}
+              disabled={favLoading}
+              aria-label={
+                isFavorited
+                  ? `Remove ${recipe.title} from favorites`
+                  : `Add ${recipe.title} to favorites`
+              }
+            >
+              <FontAwesomeIcon
+                icon={isFavorited ? fasHeart : farHeart}
+                color={isFavorited ? "red" : "grey"}
+              />
+            </button>
+          )}
+          {/* Copy/Edit Button */}
+          {isAuthenticated && (
+            <button
+              onClick={handleCopyClick}
+              style={{
+                cursor: copyLoading ? "wait" : "pointer",
+                background: "none",
+                border: "none",
+                padding: "0",
+                fontSize: "1.5rem",
+                lineHeight: "1",
+                color: "var(--text-color)", // Use theme color
+                opacity: copyLoading ? 0.5 : 1,
+              }}
+              disabled={copyLoading}
+              aria-label={`Customize ${recipe.title}`}
+            >
+              <FontAwesomeIcon icon={faPencilAlt} color={"var(--text-color)"} />
+            </button>
+          )}
+          {/* Delete Button */}
+          {showDelete && (
+            <button
+              onClick={handleDeleteClick}
+              style={{
+                ...buttonBaseStyles,
+                color: "var(--danger-color)",
+                opacity: deleteLoading ? 0.5 : 1,
+              }}
+              disabled={deleteLoading}
+            >
+              <FontAwesomeIcon icon={faTrash} />
+            </button>
+          )}
+          {/* --- Placeholder buttons if NOT authenticated --- */}
+          {!isAuthenticated && (
+            <>
+              <button
+                style={{ ...buttonBaseStyles, color: "grey" }}
+                onClick={() => alert("Please log in to favorite recipes.")}
+              >
+                <FontAwesomeIcon icon={farHeart} />
+              </button>
+              <button
+                style={{ ...buttonBaseStyles, color: "grey" }}
+                onClick={() => alert("Please log in to customize recipes.")}
+              >
+                <FontAwesomeIcon icon={faPencilAlt} />
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
+};
+
+// Define base styles for buttons 
+const buttonBaseStyles: React.CSSProperties = {
+  cursor: 'pointer',
+  background: 'none',
+  border: 'none',
+  padding: '0',
+  fontSize: '1.5rem',
+  lineHeight: '1',
+  marginLeft: '0.5rem' // Consistent spacing
 };
 
 export default RecipeCard; 

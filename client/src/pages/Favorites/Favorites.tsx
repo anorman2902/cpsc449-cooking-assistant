@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { favoriteApi } from '../../services/userService';
 import { Recipe } from '../../services/recipeService';
@@ -40,6 +40,10 @@ const Favorites: React.FC<FavoritesProps> = ({ onRecipeSelect }) => {
     fetchFavorites();
   }, [token, isAuthenticated]); // Re-fetch if token changes
 
+  const handleRecipeDeleted = (deletedRecipeId: string) => {
+    setFavorites(prevFavorites => prevFavorites.filter(recipe => recipe.id !== deletedRecipeId));
+  };
+
   // Decide what to render based on state
   let content;
   if (loading) {
@@ -56,6 +60,8 @@ const Favorites: React.FC<FavoritesProps> = ({ onRecipeSelect }) => {
             key={recipe.id}
             recipe={recipe}
             onClick={onRecipeSelect} // Use the passed prop
+            pageContext="my-recipes"
+            onRecipeDeleted={handleRecipeDeleted}
           />
         ))}
       </div>

@@ -29,6 +29,10 @@ const setupAssociations = () => {
         as: 'FavoritedByUsers'
       });
 
+    // Recipe self reference for copied/customized recipes
+    Recipe.belongsTo(Recipe, { foreignKey: 'source_recipe_id', as: 'sourceRecipe' });
+    Recipe.hasMany(Recipe, { foreignKey: 'source_recipe_id', as: 'copiedRecipes' });
+
     // Shopping List Relationships
     User.hasMany(ShoppingList, { foreignKey: 'user_id', onDelete: 'CASCADE' });
     ShoppingList.belongsTo(User, { foreignKey: 'user_id' });

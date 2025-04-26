@@ -28,8 +28,15 @@ const Recipe = sequelize.define('Recipe', {
     servings: { type: DataTypes.INTEGER, allowNull: false },
     meal_type: { type: DataTypes.ENUM('Breakfast', 'Lunch', 'Dinner', 'Snack'), allowNull: false },
     best_time: { type: DataTypes.ENUM('Morning', 'Afternoon', 'Evening'), allowNull: false },
-    image_url: { type: DataTypes.STRING, allowNull: true } // Filename only, not full path
+    image_url: { type: DataTypes.STRING, allowNull: true }, // Filename only, not full path
+    source_recipe_id: { 
+        type: DataTypes.UUID,
+        allowNull: true,
+    },
 }, { timestamps: true });
+
+    //Recipe.belongsTo(Recipe, { foreignKey: 'source_recipe_id', as: 'sourceRecipe' });
+    //Recipe.hasMany(Recipe, { foreignKey: 'source_recipe_id', as: 'copiedRecipes' });
 
 
 module.exports = Recipe;

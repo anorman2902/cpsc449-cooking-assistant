@@ -14,7 +14,7 @@ const API_BASE_URL = 'http://localhost:3001/api';
  * @param {string | null} token - JWT token for authentication
  * @returns {Object} Headers object with Authorization if token exists
  */
-const getAuthHeaders = (token: string | null) => {
+export const getAuthHeaders = (token: string | null) => {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -46,7 +46,7 @@ export class ApiError extends Error {
  * @returns {Promise<any>} Parsed response data
  * @throws {ApiError} If response is not OK
  */
-const handleResponse = async (response: Response) => {
+export const handleResponse = async (response: Response) => {
   const data = await response.json();
   
   if (!response.ok) {
