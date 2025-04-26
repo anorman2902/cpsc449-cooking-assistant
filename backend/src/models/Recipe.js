@@ -7,11 +7,20 @@ const sequelize = require('../config/db');
  * Represents a cooking recipe with ingredients, steps, and metadata.
  * For detailed image handling documentation, see: /docs/image-handling.md
  */
+
+const User = require('./User');
+const UserFavorite = require('./UserFavorite'); // junction
+
 const Recipe = sequelize.define('Recipe', {
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     title: { type: DataTypes.STRING, allowNull: false },
-    description: { type: DataTypes.TEXT, allowNull: false },
+    description: { type: DataTypes.TEXT, allowNull: true },
     steps: { type: DataTypes.TEXT, allowNull: false },
+    user_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: { model: 'Users', key: 'id' }
+    },
     prep_time: { type: DataTypes.INTEGER, allowNull: false }, // in minutes
     cook_time: { type: DataTypes.INTEGER, allowNull: false }, // in minutes
     total_time: { type: DataTypes.INTEGER, allowNull: false }, // in minutes
@@ -22,11 +31,5 @@ const Recipe = sequelize.define('Recipe', {
     image_url: { type: DataTypes.STRING, allowNull: true } // Filename only, not full path
 }, { timestamps: true });
 
-// ✅ Import User after defining Recipe
-const User = require('./User');
-
-// ✅ Set up association after importing User
-User.hasMany(Recipe, { foreignKey: 'user_id', onDelete: 'CASCADE' });
-Recipe.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = Recipe;

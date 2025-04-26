@@ -4,8 +4,10 @@
  * Provides authentication state management across the application.
  * Handles user login, signup, logout, and token storage.
  */
-import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, useContext, ReactNode, useCallback } from 'react';
 import { authApi, ApiError } from '../services/api';
+import { favoriteApi } from '../services/userService';
+import { Recipe } from '../services/recipeService';
 
 // Define User type
 interface User {
@@ -26,6 +28,10 @@ interface AuthContextType {
   authError: string | null;
   clearAuthError: () => void;
   loading: boolean;
+  favoriteIds: Set<string>;
+  addFavoriteId: (recipeId: string) => void;
+  removeFavoriteId: (recipeId: string) => void;
+  fetchUserFavorites: () => Promise<void>;
 }
 
 // Create context with default values
@@ -49,37 +55,60 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   
-  // Check for existing token on initial load
+  // Function to fetch favorite IDs
+  const fetchUserFavorites = useCallback(async () => { // Use useCallback
+    const currentToken = localStorage.getItem('auth_token'); // Check token again
+    if (!currentToken) {
+      setFavoriteIds(new Set()); // Clear favorites if no token
+      return;
+    }
+    try {
+      // Fetch full favorite recipe objects
+      const favoritesData = await favoriteApi.getFavorites(currentToken);
+      // Extract only IDs and store in the Set
+      const ids = favoritesData.map(recipe => recipe.id);
+      setFavoriteIds(new Set(ids));
+    } catch (error) {
+      console.error('Failed to fetch favorites in context:', error);
+      // Don't clear favorites on error, maybe loaded previously
+    }
+  }, []); // Dependency array empty, uses localStorage directly
+
+  // Initial token verification and favorite fetching 
   useEffect(() => {
-    const verifyToken = async () => {
+    const verifyAndFetch = async () => {
       const storedToken = localStorage.getItem('auth_token');
-      
+      setLoading(true); // Start loading
+      setFavoriteIds(new Set()); // Reset favorites initially
+
       if (!storedToken) {
         setLoading(false);
         return;
       }
-      
+
       try {
-        // Verify token with backend
         const data = await authApi.verifyToken(storedToken);
-        
-        // Set authentication state
         setToken(storedToken);
         setUser(data.user);
         setIsAuthenticated(true);
+        // Fetch favorites *after* successful token verification
+        await fetchUserFavorites();
       } catch (error) {
-        // Token is invalid or expired
         console.error('Token verification failed:', error);
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
+        setIsAuthenticated(false); // Ensure state is cleared on error
+        setUser(null);
+        setToken(null);
       } finally {
-        setLoading(false);
+        setLoading(false); // Stop loading
       }
     };
-    
-    verifyToken();
-  }, []);
+
+    verifyAndFetch();
+  }, [fetchUserFavorites]);
   
   // Clear authentication error
   const clearAuthError = () => {
@@ -102,7 +131,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setToken(data.token);
       setIsAuthenticated(true);
       setAuthError(null);
-      
+      await fetchUserFavorites(); // Fetch favorites after login
       return true;
     } catch (error) {
       // Handle API errors
@@ -112,6 +141,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setAuthError('An unexpected error occurred during login');
       }
       console.error('Login error:', error);
+      setFavoriteIds(new Set());
       return false;
     } finally {
       setLoading(false);
@@ -134,7 +164,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setToken(data.token);
       setIsAuthenticated(true);
       setAuthError(null);
-      
+      setFavoriteIds(new Set());
       return true;
     } catch (error) {
       // Handle API errors
@@ -144,6 +174,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setAuthError('An unexpected error occurred during signup');
       }
       console.error('Signup error:', error);
+      setFavoriteIds(new Set());
       return false;
     } finally {
       setLoading(false);
@@ -160,8 +191,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     setToken(null);
     setIsAuthenticated(false);
+    setFavoriteIds(new Set());
   };
   
+  // Functions to update local favorite state
+  const addFavoriteId = (recipeId: string) => {
+    setFavoriteIds(prevIds => new Set(prevIds).add(recipeId));
+  };
+
+  const removeFavoriteId = (recipeId: string) => {
+    setFavoriteIds(prevIds => {
+      const newIds = new Set(prevIds);
+      newIds.delete(recipeId);
+      return newIds;
+    });
+  };
+
   // Provide auth context to children
   return (
     <AuthContext.Provider value={{
@@ -174,6 +219,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       authError,
       clearAuthError,
       loading,
+      favoriteIds,
+      addFavoriteId,
+      removeFavoriteId, 
+      fetchUserFavorites 
     }}>
       {children}
     </AuthContext.Provider>

@@ -1,0 +1,30 @@
+.favorites-page {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 1rem;
+  }
+  
+  .favorites-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--text-color); /* Use theme variable */
+  }
+  
+  .favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  
+  .loading-indicator,
+  .error-message,
+  .no-favorites {
+     text-align: center;
+     padding: 2rem;
+     font-size: 1.2rem;
+     color: var(--loading-text-color, #666); /* Use theme variable */
+  }
+  
+  .error-message {
+      color: var(--danger-color, #d9534f); /* Use theme variable */
+  }

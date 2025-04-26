@@ -12,6 +12,7 @@ import SearchResults from './pages/SearchResults';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import RecipeDetails from './pages/RecipeDetails';
+import Favorites from './pages/Favorites';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
@@ -70,6 +71,8 @@ const AppContent = () => {
         return <Auth />;
       case 'profile':
         return isAuthenticated ? <Profile /> : <Auth />;
+      case 'favorites':
+        return isAuthenticated ? <Favorites onRecipeSelect={handleRecipeSelect} /> : <Auth />;
       case 'recipe-details':
         return selectedRecipeId ? 
           <RecipeDetails recipeId={selectedRecipeId} onBack={handleBackFromRecipeDetails} /> : 

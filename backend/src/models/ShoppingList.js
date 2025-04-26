@@ -10,12 +10,5 @@ const ShoppingList = sequelize.define('ShoppingList', {
     quantity: { type: DataTypes.FLOAT, allowNull: false }
 }, { timestamps: true });
 
-// One User can have many items in their Shopping List
-User.hasMany(ShoppingList, { foreignKey: 'user_id', onDelete: 'CASCADE' });
-ShoppingList.belongsTo(User, { foreignKey: 'user_id' });
-
-// One Ingredient can appear in many Users' Shopping Lists
-Ingredient.hasMany(ShoppingList, { foreignKey: 'ingredient_id', onDelete: 'CASCADE' });
-ShoppingList.belongsTo(Ingredient, { foreignKey: 'ingredient_id' });
 
 module.exports = ShoppingList;

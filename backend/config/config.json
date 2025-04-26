@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "postgres",
-    "password": "password",
+    "password": "350015",
     "database": "recipe_db",
     "host": "localhost",
     "port": 5432,

@@ -89,7 +89,8 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage }) => {
         ) : (
           // Additional links for authenticated users
           <>
-            <a href="/favorites" className="nav-link">My Favorites</a>
+            <a href="/favorites" className={`nav-link ${currentPage === 'favorites' ? 'active' : ''}`}
+              onClick={(e) => handleNavClick(e, 'favorites')}>My Favorites</a>
             <a href="/profile" className={`nav-link profile-link ${currentPage === 'profile' ? 'active' : ''}`}
               onClick={(e) => handleNavClick(e, 'profile')}>Profile</a>
             <a href="/logout" className="nav-link logout-link" onClick={handleLogout}>Logout</a>

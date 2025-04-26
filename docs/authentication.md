@@ -51,7 +51,8 @@ Implemented an authentication system that allows users to sign up, log in, view 
 #### 1. Database Setup
 
     # Create the database
-    sudo -u postgres psql -c "CREATE DATABASE smart_cooking;"
+    sudo -u postgres psql
+    CREATE DATABASE recipe_db;
 
 #### 2. Backend Configuration
 
@@ -60,14 +61,15 @@ Implemented an authentication system that allows users to sign up, log in, view 
     touch .env
 
 Add environment variables to `.env`:
-
     PORT=3001
     JWT_SECRET=your_secure_jwt_secret_key
-    DB_NAME=smart_cooking
+    DB_NAME=recipe_db
     DB_USER=postgres
-    DB_PASS=350015
+    DB_PASSWORD=your_postgres_password
     DB_HOST=localhost
     DB_PORT=5432
+
+    Replace `your_postgres_password` with your actual PostgreSQL password.
 
 #### 3. Run Migrations
 

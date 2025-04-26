@@ -111,6 +111,8 @@ The project is organized with a scalable architecture to support future growth:
    ```bash
    # Connect to PostgreSQL
    psql -U postgres
+   # (if not working use):
+   sudo -u postgres psql
    
    # Create the database
    CREATE DATABASE recipe_db;
@@ -146,7 +148,14 @@ cd client && npm install
 cd backend && npm install
 ```
 
-4. Seed the database with initial recipe data:
+4. Run Database Migrations to create tables:
+```bash
+# Still in Backend directory
+npx sequelize-cli db:migrate
+# Requires backend/config/config.json 'password' field to match the same   DB_PASSWORD in your .env file
+```
+
+5. Seed the database with initial recipe data:
 ```bash
 cd backend && npm run seed
 ```
@@ -158,7 +167,7 @@ This will populate your database with:
 - Recipe-ingredient relationships
 - Sample shopping list items
 
-5. Start the development servers:
+6. Start the development servers:
 
 ```bash
 # Start backend server
@@ -168,7 +177,7 @@ cd backend && npm run dev
 cd client && npm start
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
+7. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## API Endpoints
 
@@ -233,7 +242,7 @@ The application includes a complete authentication system with:
 -   Protected routes
 -   User profiles
 
-For detailed information on the authentication implementation, see the [Authentication Documentation](./docs/AUTHENTICATION.md).
+For detailed information on the authentication implementation, see the [Authentication Documentation](./docs/Authentication.md).
 
 ## Troubleshooting
 

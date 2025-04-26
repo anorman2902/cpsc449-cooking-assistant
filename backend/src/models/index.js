@@ -4,15 +4,32 @@ const Recipe = require('./Recipe');
 const Ingredient = require('./Ingredient');
 const RecipeIngredient = require('./RecipeIngredient');
 const ShoppingList = require('./ShoppingList');
+const UserFavorite = require('./UserFavorite');
 
-// ✅ Define associations after loading models
+// Define associations after loading models
 const setupAssociations = () => {
     User.hasMany(Recipe, { foreignKey: 'user_id', onDelete: 'CASCADE' });
     Recipe.belongsTo(User, { foreignKey: 'user_id' });
 
-    Recipe.belongsToMany(Ingredient, { through: RecipeIngredient, foreignKey: 'recipe_id' });
+    // Recipe <-> Ingredient Relationship
+    Recipe.belongsToMany(Ingredient, { through: RecipeIngredient, foreignKey: 'recipe_id', as: 'Ingredients' });
     Ingredient.belongsToMany(Recipe, { through: RecipeIngredient, foreignKey: 'ingredient_id' });
 
+    // User <-> Recipe Favorite Relationship
+    User.belongsToMany(Recipe, {
+        through: UserFavorite,
+        foreignKey: 'userId',
+        otherKey: 'recipeId',
+        as: 'FavoriteRecipes'
+      });
+      Recipe.belongsToMany(User, {
+        through: UserFavorite,
+        foreignKey: 'recipeId',
+        otherKey: 'userId',
+        as: 'FavoritedByUsers'
+      });
+
+    // Shopping List Relationships
     User.hasMany(ShoppingList, { foreignKey: 'user_id', onDelete: 'CASCADE' });
     ShoppingList.belongsTo(User, { foreignKey: 'user_id' });
 
@@ -20,11 +37,16 @@ const setupAssociations = () => {
     ShoppingList.belongsTo(Ingredient, { foreignKey: 'ingredient_id' });
 };
 
-// ✅ Sync database
+setupAssociations();
+
+// Sync database
 const syncDatabase = async () => {
-    setupAssociations(); // Ensure relationships are set first
-    await sequelize.sync({ alter: true }); // Use `force: true` for a fresh start
-    console.log("✅ Database synced successfully!");
+    try {
+        await sequelize.sync({ alter: true }); // Or { force: false } in prod
+        console.log("✅ Database synced successfully!");
+    } catch (error) {
+        console.error("❌ Error syncing database:", error);
+    }
 };
 
-module.exports = { sequelize, User, Recipe, Ingredient, RecipeIngredient, ShoppingList, syncDatabase };
+module.exports = { sequelize, User, Recipe, Ingredient, RecipeIngredient, ShoppingList, UserFavorite, syncDatabase };

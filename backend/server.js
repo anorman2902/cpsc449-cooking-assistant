@@ -7,6 +7,7 @@ const { sequelize } = require('./src/models');
 // Import routes
 const authRoutes = require('./src/routes/authRoutes');
 const recipeRoutes = require('./src/routes/recipeRoutes');
+const userRoutes = require('./src/routes/userRoutes');
 
 // Initialize Express app
 const app = express();
@@ -25,6 +26,7 @@ app.use('/images', express.static(path.join(__dirname, 'public/images')));
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
+app.use('/api/users', userRoutes);
 
 // Test route
 app.get('/api/test', (req, res) => {

@@ -18,6 +18,7 @@ exports.getAllRecipes = async (req, res) => {
       attributes: ['id', 'title', 'image_url'],
       include: [{
         model: Ingredient,
+        as: 'Ingredients',
         through: { attributes: [] },
         attributes: ['id', 'name']
       }]
@@ -58,6 +59,7 @@ exports.searchRecipes = async (req, res) => {
       attributes: ['id', 'title', 'image_url'],
       include: [{
         model: Ingredient,
+        as: 'Ingredients',
         through: { attributes: [] },
         attributes: ['id', 'name']
       }]
@@ -68,6 +70,7 @@ exports.searchRecipes = async (req, res) => {
       attributes: ['id', 'title', 'image_url'],
       include: [{
         model: Ingredient,
+        as: 'Ingredients',
         through: { attributes: [] },
         where: {
           name: {
@@ -116,6 +119,7 @@ exports.getRecipeById = async (req, res) => {
                   'total_time', 'difficulty', 'servings', 'meal_type', 'best_time', 'image_url'],
       include: [{
         model: Ingredient,
+        as: 'Ingredients',
         through: { attributes: [] },
         attributes: ['id', 'name']
       }]

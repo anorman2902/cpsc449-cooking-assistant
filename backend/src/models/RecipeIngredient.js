@@ -11,8 +11,4 @@ const RecipeIngredient = sequelize.define('RecipeIngredient', {
     quantity: { type: DataTypes.FLOAT, allowNull: false }
 }, { timestamps: false });
 
-// Many-to-Many Relationship: Recipes ↔ Ingredients
-Recipe.belongsToMany(Ingredient, { through: RecipeIngredient, foreignKey: 'recipe_id' });
-Ingredient.belongsToMany(Recipe, { through: RecipeIngredient, foreignKey: 'ingredient_id' });
-
 module.exports = RecipeIngredient;
