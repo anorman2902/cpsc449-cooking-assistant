@@ -83,7 +83,70 @@ exports.removeFavorite = async (req, res) => {
   }
 };
 
-// --- Add updateProfile method later in Phase 2 ---
-// (Code for updateProfile from previous response goes here later)
-// --- Add getProfile method later in Phase 2 ---
-// (Code for getProfile from previous response goes here later)
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const userId = req.user.id; // From verifyToken middleware
+        const { username } = req.body;
+
+        if (!username || username.trim() === '') {
+            return res.status(400).json({ message: 'Username cannot be empty' });
+        }
+
+        const trimmedUsername = username.trim();
+
+        // Optional: Check if the new username is already taken by ANOTHER user
+        const existingUser = await User.findOne({
+             where: {
+                username: trimmedUsername,
+                id: { [Op.ne]: userId } 
+             }
+        });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Username already taken' });
+        }
+
+        // Update username
+        const [updatedCount] = await User.update({ username: trimmedUsername }, {
+            where: { id: userId }
+        });
+
+        if (updatedCount === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Fetch the updated user data to return (excluding password)
+        const updatedUser = await User.findByPk(userId, {
+             attributes: ['id', 'username', 'email', 'createdAt', 'updatedAt']
+        });
+
+        res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
+
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        // Check for validation errors from the model (like unique constraint if not handled above)
+        if (error.name === 'SequelizeUniqueConstraintError') {
+             return res.status(400).json({ message: 'Username already taken.' });
+        }
+        res.status(500).json({ message: 'Server error updating profile' });
+    }
+};
+
+exports.getProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await User.findByPk(userId, {
+            // Exclude password field!
+            attributes: ['id', 'username', 'email', 'createdAt', 'updatedAt']
+        });
+
+        if (!user) {
+             // Should not happen if verifyToken middleware ran successfully
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json(user); // Return the user object directly
+    } catch (error) {
+        console.error('Error getting profile:', error);
+        res.status(500).json({ message: 'Server error getting profile' });
+    }
+};

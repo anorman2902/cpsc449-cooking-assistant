@@ -32,6 +32,7 @@ interface AuthContextType {
   addFavoriteId: (recipeId: string) => void;
   removeFavoriteId: (recipeId: string) => void;
   fetchUserFavorites: () => Promise<void>;
+  updateUserContext: (updatedUserData: User) => void;
 }
 
 // Create context with default values
@@ -154,11 +155,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(true);
       // Call API signup endpoint
       const data = await authApi.signup(username, email, password);
-      
+
       // Store in localStorage
-      localStorage.setItem('auth_token', data.token);
-      localStorage.setItem('auth_user', JSON.stringify(data.user));
-      
+      localStorage.setItem("auth_token", data.token);
+      localStorage.setItem("auth_user", JSON.stringify(data.user));
+
       // Update state
       setUser(data.user);
       setToken(data.token);
@@ -167,15 +168,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setFavoriteIds(new Set());
       return true;
     } catch (error) {
-      // Handle API errors
+      console.error("Signup error:", error); 
+      let errorMessage = "An unexpected error occurred during signup";
       if (error instanceof ApiError) {
-        setAuthError(error.message);
-      } else {
-        setAuthError('An unexpected error occurred during signup');
+        errorMessage = error.message; // Get the specific message from backend
       }
-      console.error('Signup error:', error);
+      setAuthError(errorMessage); // Explicitly set the error state
       setFavoriteIds(new Set());
-      return false;
+      return false; // Return after setting the error
     } finally {
       setLoading(false);
     }
@@ -207,6 +207,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
   };
 
+  // Update user state in context
+  const updateUserContext = (updatedUserData: User) => {
+    // Update user state
+    setUser(updatedUserData);
+    // Also update localStorage if you store the user object there
+    localStorage.setItem('auth_user', JSON.stringify(updatedUserData));
+};
+
   // Provide auth context to children
   return (
     <AuthContext.Provider value={{
@@ -222,7 +230,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       favoriteIds,
       addFavoriteId,
       removeFavoriteId, 
-      fetchUserFavorites 
+      fetchUserFavorites,
+      updateUserContext
     }}>
       {children}
     </AuthContext.Provider>
