@@ -6,6 +6,7 @@ import './SearchResults.css';
 import SearchBar from '../../components/common/SearchBar/SearchBar';
 import RecipeCard from '../../components/features/RecipeCard';
 import { searchRecipes, Recipe } from '../../services/recipeService';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface SearchResultsProps {
   query?: string;
@@ -23,6 +24,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query = '', onSearch, onR
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const { theme } = useTheme();
 
   // Fetch recipes when query changes
   useEffect(() => {
@@ -51,7 +53,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query = '', onSearch, onR
   };
 
   return (
-    <div className="search-results-page">
+    <div className={`search-results-page ${theme === 'dark' ? 'theme-dark' : ''}`}>
       <div className="search-results-header">
         <h1 className="search-results-title">Search Results</h1>
         <div className="search-bar-container">

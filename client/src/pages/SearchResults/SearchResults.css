@@ -1,5 +1,15 @@
 /* Search Results Page Styles */
 
+/* Light mode (default) variables */
+:root {
+  --search-results-title-color: #333;
+}
+
+/* Dark mode variables */
+.theme-dark {
+  --search-results-title-color: #e0e0e0;
+}
+
 .search-results-page {
   max-width: 1200px;
   margin: 0 auto;
@@ -15,7 +25,7 @@
 .search-results-title {
   font-size: 2rem;
   margin-bottom: 1.5rem;
-  color: #333;
+  color: var(--search-results-title-color);
   text-align: center;
 }
 
