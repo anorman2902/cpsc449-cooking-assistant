@@ -13,6 +13,7 @@ A lightweight React-based web application that helps users find recipes based on
 - **Backend API**: REST API for recipes and ingredients
 - **Database Integration**: PostgreSQL storage for recipes and ingredients
 - **Recipe Images**: AI-generated images for recipes stored locally
+- **AI Recipe Insights**: AI-generated culinary insights for recipes using OpenAI's GPT-4o-mini
 
 ## Documentation
 
@@ -21,6 +22,8 @@ Comprehensive documentation is available in the `/docs` directory:
 - [Authentication Documentation](/docs/authentication.md) - User authentication system
 - [Search Results Template](/docs/search-results-template.md) - Usage guide for search results
 - [Recipe Framework](/docs/recipe-framework.md) - Guide for using the recipe framework for new recipes
+- [AI Insights Documentation](/docs/ai-insights.md) - Complete guide for AI-generated recipe insights
+- [Recipe Creation Guide](/docs/recipe-creation.md) - Guide for implementing recipe creation with AI insights
 
 ## Project Structure
 
@@ -32,6 +35,8 @@ The project is organized with a scalable architecture to support future growth:
 │   ├── authentication.md    # Authentication system documentation
 │   ├── search-results-template.md # Search results template documentation
 │   ├── recipe-framework.md  # Recipe framework documentation
+│   ├── ai-insights.md       # AI insights feature documentation
+│   ├── recipe-creation.md   # Recipe creation guide with AI insights
 │   └── README.md            # README for docs
 ├── client/                  # Frontend code
 │   ├── public/              # Static files
@@ -84,6 +89,8 @@ The project is organized with a scalable architecture to support future growth:
 │   │   │   ├── RecipeIngredient.js  # Join table model
 │   │   │   ├── ShoppingList.js      # Shopping list model
 │   │   │   └── User.js              # User model
+│   │   ├── services/        # Service modules
+│   │   │   └── openaiService.js     # OpenAI integration service
 │   │   └── routes/          # API routes
 │   │       ├── authRoutes.js        # Authentication routes
 │   │       └── recipeRoutes.js      # Recipe routes
@@ -131,8 +138,9 @@ The project is organized with a scalable architecture to support future growth:
    DB_HOST=localhost
    DB_PORT=5432
    JWT_SECRET=your-secret-key-for-jwt-tokens
+   OPENAI_API_KEY=your_openai_api_key
    ```
-   Replace `your_postgres_password` with your actual PostgreSQL password.
+   Replace `your_postgres_password` with your actual PostgreSQL password and `your_openai_api_key` with your OpenAI API key for AI insights generation.
 
 ### Installation
 
@@ -200,6 +208,7 @@ The backend provides the following API endpoints:
 - **PostgreSQL Database**: Stores recipes, ingredients, and users
 - **RESTful API**: Express.js backend with well-defined endpoints
 - **Sequelize ORM**: Database models and relationships
+- **AI-Powered Insights**: Integration with OpenAI's GPT-4o-mini for automatic culinary insights generation
 
 ## Project Organization
 

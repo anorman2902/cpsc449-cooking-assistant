@@ -183,4 +183,46 @@
   .metadata-label {
     min-width: 120px;
   }
+}
+
+/* AI Insights Section */
+.recipe-ai-insight {
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+  border-left: 4px solid #38b2ac;
+}
+
+.recipe-ai-insight h2 {
+  color: var(--text-primary);
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.ai-insight-text {
+  font-style: italic;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.ai-badge {
+  background-color: #38b2ac;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.theme-dark .recipe-ai-insight {
+  background-color: rgba(56, 178, 172, 0.1);
+  border-left: 4px solid #38b2ac;
+}
+
+.theme-dark .ai-badge {
+  background-color: #38b2ac;
 } 

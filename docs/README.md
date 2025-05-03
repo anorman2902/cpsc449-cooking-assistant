@@ -6,6 +6,8 @@ This directory contains comprehensive documentation for the Recipe Finder applic
 
 | Document | Description |
 |----------|-------------|
+| [ai-insights.md](ai-insights.md) | Implementation details for AI-generated recipe insights using OpenAI |
+| [recipe-creation.md](recipe-creation.md) | Guide for implementing the recipe creation feature with AI insights integration |
 | [image-handling.md](image-handling.md) | Complete guide for managing recipe images throughout the application |
 | [authentication.md](authentication.md) | Details on the authentication system implementation |
 | [search-results-template.md](search-results-template.md) | Usage guide for the search results template |
@@ -44,6 +46,7 @@ The application allows users to search for recipes based on available ingredient
 - Search recipes by name or ingredient
 - View recipe details including ingredients
 - User authentication (registration and login)
+- AI-generated insights for each recipe
 - Responsive design for all device sizes
 
 ## Architecture
@@ -53,13 +56,14 @@ The application follows a standard client-server architecture:
 - **Client**: React frontend serving the user interface
 - **API Server**: Express.js backend providing REST endpoints
 - **Database**: PostgreSQL storing recipes, ingredients, and user data
+- **AI Integration**: OpenAI API for generating recipe insights
 
 ## Setup Quick Reference
 
 1. Install prerequisites (Node.js, PostgreSQL)
 2. Clone the repository
 3. Set up PostgreSQL database (`recipe_db`)
-4. Configure environment variables in `.env`
+4. Configure environment variables in `.env` (including OpenAI API key)
 5. Install dependencies (`npm install` in both client and backend directories)
 6. Seed the database (`npm run seed` in backend directory)
 7. Start development servers (`npm run dev` for backend, `npm start` for client)

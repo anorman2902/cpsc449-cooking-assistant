@@ -29,7 +29,8 @@ export interface Recipe {
   best_time?: 'Morning' | 'Afternoon' | 'Evening';
   Ingredients?: Ingredient[];
   user_id?: string; 
-  source_recipe_id?: string; 
+  source_recipe_id?: string;
+  ai_insight?: string; // AI-generated insights about the recipe
 }
 
 /**

@@ -2,6 +2,7 @@ const { Recipe, Ingredient, RecipeIngredient, UserFavorite } = require('../model
 const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 const sequelize = require('../config/db');
+const openaiService = require('../services/openaiService');
 
 // Base URL for images
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
@@ -52,37 +53,73 @@ exports.searchRecipes = async (req, res) => {
       return res.status(400).json({ message: 'Search query is required' });
     }
 
-    // Search by recipe name
-    const recipesByName = await Recipe.findAll({
-      where: {
-        title: {
-          [Op.iLike]: `%${query}%`
-        }
-      },
-      attributes: ['id', 'title', 'image_url', 'source_recipe_id', 'user_id'],
-      include: [{
-        model: Ingredient,
-        as: 'Ingredients',
-        through: { attributes: [] },
-        attributes: ['id', 'name']
-      }]
-    });
+    // Split the query by comma and trim whitespace
+    const searchTerms = query.split(',').map(term => term.trim()).filter(term => term.length > 0);
+    
+    // Initialize arrays to store results
+    let recipesByName = [];
+    let recipesByIngredient = [];
 
-    // Search by ingredient name
-    const recipesByIngredient = await Recipe.findAll({
-      attributes: ['id', 'title', 'image_url'],
-      include: [{
-        model: Ingredient,
-        as: 'Ingredients',
-        through: { attributes: [] },
+    // If we have multiple terms, assume they're ingredients
+    if (searchTerms.length > 1) {
+      // Search for recipes that contain ALL of the ingredients (AND condition)
+      // We need to query differently for the AND relationship
+      
+      // First get all recipes
+      const allRecipes = await Recipe.findAll({
+        attributes: ['id', 'title', 'image_url', 'source_recipe_id', 'user_id', 'prep_time', 'cook_time', 'total_time'],
+        include: [{
+          model: Ingredient,
+          as: 'Ingredients',
+          through: { attributes: [] },
+          attributes: ['id', 'name']
+        }]
+      });
+      
+      // Then filter for those that have ALL the search terms
+      recipesByIngredient = allRecipes.filter(recipe => {
+        const recipeIngredients = recipe.Ingredients.map(ing => ing.name.toLowerCase());
+        // Check if ALL search terms are included in this recipe's ingredients
+        return searchTerms.every(term => 
+          recipeIngredients.some(ingName => ingName.includes(term.toLowerCase()))
+        );
+      });
+    } else {
+      // Single term - could be recipe name or ingredient
+      const singleTerm = searchTerms[0];
+      
+      // Search by recipe name
+      recipesByName = await Recipe.findAll({
         where: {
-          name: {
-            [Op.iLike]: `%${query}%`
+          title: {
+            [Op.iLike]: `%${singleTerm}%`
           }
         },
-        attributes: ['id', 'name']
-      }]
-    });
+        attributes: ['id', 'title', 'image_url', 'source_recipe_id', 'user_id', 'prep_time', 'cook_time', 'total_time'],
+        include: [{
+          model: Ingredient,
+          as: 'Ingredients',
+          through: { attributes: [] },
+          attributes: ['id', 'name']
+        }]
+      });
+
+      // Search by ingredient name
+      recipesByIngredient = await Recipe.findAll({
+        attributes: ['id', 'title', 'image_url', 'source_recipe_id', 'user_id', 'prep_time', 'cook_time', 'total_time'],
+        include: [{
+          model: Ingredient,
+          as: 'Ingredients',
+          through: { attributes: [] },
+          where: {
+            name: {
+              [Op.iLike]: `%${singleTerm}%`
+            }
+          },
+          attributes: ['id', 'name']
+        }]
+      });
+    }
 
     // Combine results and remove duplicates
     const allRecipes = [...recipesByName, ...recipesByIngredient];
@@ -93,15 +130,31 @@ exports.searchRecipes = async (req, res) => {
       }
       uniqueRecipeIds.add(recipe.id);
       return true;
-    }).map(recipe => {
-      const plainRecipe = recipe.get({ plain: true });
-      if (plainRecipe.image_url) {
-        plainRecipe.image_url = `${BASE_URL}/images/recipes/${plainRecipe.image_url.replace(/^\/images\/recipes\//, '')}`;
-      }
-      return plainRecipe;
     });
 
-    return res.status(200).json(uniqueRecipes);
+    // For each recipe, fetch all ingredients (not just the matching ones)
+    const recipesWithAllIngredients = await Promise.all(
+      uniqueRecipes.map(async (recipe) => {
+        // Get the complete recipe with all ingredients
+        const completeRecipe = await Recipe.findByPk(recipe.id, {
+          attributes: ['id', 'title', 'image_url', 'source_recipe_id', 'user_id', 'prep_time', 'cook_time', 'total_time'],
+          include: [{
+            model: Ingredient,
+            as: 'Ingredients',
+            through: { attributes: [] },
+            attributes: ['id', 'name']
+          }]
+        });
+        
+        const plainRecipe = completeRecipe.get({ plain: true });
+        if (plainRecipe.image_url) {
+          plainRecipe.image_url = `${BASE_URL}/images/recipes/${plainRecipe.image_url.replace(/^\/images\/recipes\//, '')}`;
+        }
+        return plainRecipe;
+      })
+    );
+
+    return res.status(200).json(recipesWithAllIngredients);
   } catch (error) {
     console.error('Error searching recipes:', error);
     return res.status(500).json({ message: 'Server error' });
@@ -119,7 +172,7 @@ exports.getRecipeById = async (req, res) => {
 
     const recipe = await Recipe.findByPk(id, {
       attributes: ['id', 'title', 'description', 'steps', 'prep_time', 'cook_time', 
-                  'total_time', 'difficulty', 'servings', 'meal_type', 'best_time', 'image_url', 'source_recipe_id', 'user_id'],
+                  'total_time', 'difficulty', 'servings', 'meal_type', 'best_time', 'image_url', 'source_recipe_id', 'user_id', 'ai_insight'],
       include: [{
         model: Ingredient,
         as: 'Ingredients',
@@ -135,6 +188,34 @@ exports.getRecipeById = async (req, res) => {
     const plainRecipe = recipe.get({ plain: true });
     if (plainRecipe.image_url) {
       plainRecipe.image_url = `${BASE_URL}/images/recipes/${plainRecipe.image_url.replace(/^\/images\/recipes\//, '')}`;
+    }
+    
+    // If recipe doesn't have an AI insight yet, generate one and update the recipe
+    if (!plainRecipe.ai_insight) {
+      try {
+        const ingredientsText = recipe.Ingredients ? 
+          recipe.Ingredients.map(ing => ing.name).join(', ') : '';
+        
+        const insight = await openaiService.generateRecipeInsight(
+          recipe.title,
+          recipe.description,
+          ingredientsText,
+          recipe.difficulty,
+          recipe.meal_type
+        );
+        
+        // Update recipe with the new insight
+        await Recipe.update(
+          { ai_insight: insight },
+          { where: { id: recipe.id } }
+        );
+        
+        // Add the insight to the response
+        plainRecipe.ai_insight = insight;
+      } catch (insightError) {
+        console.error('Error generating recipe insight:', insightError);
+        // Continue without insight if generation fails
+      }
     }
     
     return res.status(200).json(plainRecipe);
@@ -226,7 +307,14 @@ exports.updateRecipe = async (req, res) => {
   }
 
   try {
-      const recipe = await Recipe.findByPk(recipeIdToUpdate);
+      const recipe = await Recipe.findByPk(recipeIdToUpdate, {
+          include: [{
+              model: Ingredient,
+              as: 'Ingredients',
+              through: { attributes: [] },
+              attributes: ['id', 'name']
+          }]
+      });
 
       if (!recipe) {
           return res.status(404).json({ message: 'Recipe not found' });
@@ -235,6 +323,34 @@ exports.updateRecipe = async (req, res) => {
       // Verify ownership! User can only update their own copies/creations
       if (recipe.user_id !== userId) {
           return res.status(403).json({ message: 'You can only edit your own recipes' });
+      }
+
+      // Get ingredients text for AI insight generation
+      const ingredientsText = recipe.Ingredients ? 
+          recipe.Ingredients.map(ing => ing.name).join(', ') : '';
+          
+      // If any relevant fields changed, generate a new AI insight
+      const shouldUpdateInsight = 
+          title !== recipe.title || 
+          description !== recipe.description || 
+          difficulty !== recipe.difficulty || 
+          meal_type !== recipe.meal_type;
+          
+      // Generate new AI insight if needed
+      let aiInsight = recipe.ai_insight;
+      if (shouldUpdateInsight) {
+          try {
+              aiInsight = await openaiService.generateRecipeInsight(
+                  title.trim(),
+                  description ?? recipe.description,
+                  ingredientsText,
+                  difficulty ?? recipe.difficulty,
+                  meal_type ?? recipe.meal_type
+              );
+          } catch (insightError) {
+              console.error('Error generating updated recipe insight:', insightError);
+              // Continue with previous insight if generation fails
+          }
       }
 
       // Update the recipe
@@ -249,6 +365,7 @@ exports.updateRecipe = async (req, res) => {
           servings: servings ?? recipe.servings,
           meal_type: meal_type ?? recipe.meal_type,
           best_time: best_time ?? recipe.best_time,
+          ai_insight: aiInsight, // Update with new or existing insight
           // Not updating ingredients here yet
       }, {
           where: { id: recipeIdToUpdate, user_id: userId } // Redundant user_id check for safety

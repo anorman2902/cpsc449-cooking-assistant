@@ -179,11 +179,15 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick, pageContext = 
             </p>
           </div>
         )}
-        {recipe.prep_time && recipe.cook_time && (
+        {recipe.total_time ? (
           <div className="recipe-card-time">
             <span>{recipe.total_time} min</span>
           </div>
-        )}
+        ) : recipe.prep_time || recipe.cook_time ? (
+          <div className="recipe-card-time">
+            <span>{(recipe.prep_time || 0) + (recipe.cook_time || 0)} min</span>
+          </div>
+        ) : null}
         {/* --- Wrapper for Action Buttons --- */}
         <div
           style={{

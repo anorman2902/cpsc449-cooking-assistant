@@ -33,6 +33,7 @@ const Recipe = sequelize.define('Recipe', {
         type: DataTypes.UUID,
         allowNull: true,
     },
+    ai_insight: { type: DataTypes.TEXT, allowNull: true }, // AI-generated insights about the recipe
 }, { timestamps: true });
 
     //Recipe.belongsTo(Recipe, { foreignKey: 'source_recipe_id', as: 'sourceRecipe' });
