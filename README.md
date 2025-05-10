@@ -14,6 +14,7 @@ A lightweight React-based web application that helps users find recipes based on
 - **Database Integration**: PostgreSQL storage for recipes and ingredients
 - **Recipe Images**: AI-generated images for recipes stored locally
 - **AI Recipe Insights**: AI-generated culinary insights for recipes using OpenAI's GPT-4o-mini
+- **Recipe Favorites**: Save and manage favorite recipes
 
 ## Documentation
 
@@ -37,15 +38,17 @@ The project is organized with a scalable architecture to support future growth:
 │   ├── recipe-framework.md  # Recipe framework documentation
 │   ├── ai-insights.md       # AI insights feature documentation
 │   ├── recipe-creation.md   # Recipe creation guide with AI insights
+│   ├── image-handling.md    # Image handling documentation
+│   ├── api-documentation.md # API documentation
+│   ├── database-setup.md    # Database setup instructions
+│   ├── getting-started.md   # Getting started guide
 │   └── README.md            # README for docs
 ├── client/                  # Frontend code
 │   ├── public/              # Static files
 │   │   ├── index.html       # Main HTML file
 │   │   ├── favicon.ico      # Website favicon
 │   │   ├── manifest.json    # Web app manifest for PWA support
-│   │   ├── robots.txt       # Instructions for web crawlers
-│   │   └── images/          # Static image files
-│   │       └── recipes/     # Recipe images (AI-generated)
+│   │   └── logo192.png, logo512.png  # Logo images
 │   ├── src/
 │   │   ├── assets/          # Images, fonts, etc.
 │   │   ├── components/      # Reusable UI components
@@ -77,6 +80,10 @@ The project is organized with a scalable architecture to support future growth:
 │   └── tsconfig.json        # TypeScript config
 ├── backend/                 # Backend code
 │   ├── src/
+│   │   ├── ai/              # AI services
+│   │   │   ├── index.js                # Main AI service entry point
+│   │   │   ├── openaiService.js        # OpenAI integration
+│   │   │   └── recipeInsightService.js # Fallback recipe insights
 │   │   ├── config/          # Configuration files
 │   │   │   └── db.js        # Database configuration
 │   │   ├── controllers/     # Request handlers
@@ -90,16 +97,20 @@ The project is organized with a scalable architecture to support future growth:
 │   │   │   ├── ShoppingList.js      # Shopping list model
 │   │   │   └── User.js              # User model
 │   │   ├── services/        # Service modules
-│   │   │   └── openaiService.js     # OpenAI integration service
 │   │   └── routes/          # API routes
 │   │       ├── authRoutes.js        # Authentication routes
-│   │       └── recipeRoutes.js      # Recipe routes
+│   │       ├── recipeRoutes.js      # Recipe routes
+│   │       └── userRoutes.js        # User routes
+│   ├── config/              # Sequelize configuration
+│   ├── migrations/          # Database migrations
+│   ├── public/              # Public assets (images)
 │   ├── seeders/             # Database seeders
 │   │   └── tempSeed.js      # Main seed file with complete test data
-│   ├── migrations/          # Database migrations
-│   ├── .env                 # Environment variables
+│   ├── tests/               # Test files
+│   ├── .sequelizerc         # Sequelize configuration
 │   ├── server.js            # Express server
 │   └── package.json         # Backend dependencies
+└── .gitignore               # Git ignore file
 ```
 
 ## Getting Started
@@ -209,6 +220,7 @@ The backend provides the following API endpoints:
 - **RESTful API**: Express.js backend with well-defined endpoints
 - **Sequelize ORM**: Database models and relationships
 - **AI-Powered Insights**: Integration with OpenAI's GPT-4o-mini for automatic culinary insights generation
+- **Recipe Favorites**: Users can save and manage their favorite recipes
 
 ## Project Organization
 

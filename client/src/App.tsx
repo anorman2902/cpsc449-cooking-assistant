@@ -13,6 +13,7 @@ import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import RecipeDetails from './pages/RecipeDetails';
 import Favorites from './pages/Favorites';
+import CreateRecipe from './pages/CreateRecipe';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
@@ -33,7 +34,7 @@ const AppContent = () => {
     }
     
     // Redirect from protected pages if not authenticated
-    if (!isAuthenticated && ['profile', 'favorites'].includes(currentPage)) {
+    if (!isAuthenticated && ['profile', 'favorites', 'create-recipe'].includes(currentPage)) {
       setCurrentPage('auth');
     }
   }, [isAuthenticated, currentPage]);
@@ -58,7 +59,7 @@ const AppContent = () => {
   // Simple routing function
   const renderPage = () => {
     // Show loading indicator during initial auth check
-    if (loading && ['profile', 'favorites'].includes(currentPage)) {
+    if (loading && ['profile', 'favorites', 'create-recipe'].includes(currentPage)) {
       return <div className="loading-container">Loading...</div>;
     }
 
@@ -77,6 +78,10 @@ const AppContent = () => {
         return selectedRecipeId ? 
           <RecipeDetails recipeId={selectedRecipeId} onBack={handleBackFromRecipeDetails} /> : 
           <Home onSearch={handleSearch} onRecipeSelect={handleRecipeSelect} />;
+      case 'create-recipe':
+        return isAuthenticated ? 
+          <CreateRecipe onBack={() => setCurrentPage('home')} /> : 
+          <Auth />;
       case 'home':
       default:
         return <Home onSearch={handleSearch} onRecipeSelect={handleRecipeSelect} />;

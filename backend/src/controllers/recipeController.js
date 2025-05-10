@@ -2,7 +2,9 @@ const { Recipe, Ingredient, RecipeIngredient, UserFavorite } = require('../model
 const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 const sequelize = require('../config/db');
-const openaiService = require('../services/openaiService');
+const aiService = require('../ai'); // Updated to use our new AI service
+const path = require('path');
+const fs = require('fs');
 
 // Base URL for images
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
@@ -196,7 +198,7 @@ exports.getRecipeById = async (req, res) => {
         const ingredientsText = recipe.Ingredients ? 
           recipe.Ingredients.map(ing => ing.name).join(', ') : '';
         
-        const insight = await openaiService.generateRecipeInsight(
+        const insight = await aiService.generateRecipeInsight(
           recipe.title,
           recipe.description,
           ingredientsText,
@@ -225,170 +227,6 @@ exports.getRecipeById = async (req, res) => {
   }
 };
 
-// Copy Recipe for User
-exports.copyRecipe = async (req, res) => {
-  const originalRecipeId = req.params.id;
-  const userId = req.user.id; // From verifyToken middleware
-  const transaction = await sequelize.transaction(); // Use transaction for multi-step operation
-
-  try {
-      // 1. Find the original recipe and its ingredients
-      const originalRecipe = await Recipe.findByPk(originalRecipeId, {
-          include: [{
-              model: Ingredient,
-              as: 'Ingredients', // Use alias
-              attributes: ['id'], 
-              through: { attributes: ['quantity'] } // Get quantity from junction table
-          }],
-          transaction
-      });
-
-      if (!originalRecipe) {
-          await transaction.rollback();
-          return res.status(404).json({ message: 'Original recipe not found' });
-      }
-
-      // 2. Create the new recipe copy
-      const newRecipeData = {
-          ...originalRecipe.get({ plain: true }), // Copy data from original
-          id: uuidv4(), // Generate NEW UUID for the copy
-          user_id: userId, // Assign to the current user
-          source_recipe_id: originalRecipeId, // Link back to the original
-          title: `${originalRecipe.title} (My Copy)`, // Indicate it's a copy
-          createdAt: new Date(), // Reset timestamps
-          updatedAt: new Date(),
-      };
-      delete newRecipeData.Ingredients;
-      delete newRecipeData.UserFavorite; // If UserFavorite gets included somehow
-      delete newRecipeData.RecipeIngredients; // If this gets included somehow
-
-      const newRecipe = await Recipe.create(newRecipeData, { transaction });
-
-      // 3. Copy the ingredient associations
-      if (originalRecipe.Ingredients && originalRecipe.Ingredients.length > 0) {
-          const newRecipeIngredients = originalRecipe.Ingredients.map(ing => ({
-              id: uuidv4(), // New ID for the junction table entry
-              recipe_id: newRecipe.id, // Link to the NEW recipe
-              ingredient_id: ing.id, // Link to the ORIGINAL ingredient
-              quantity: ing.RecipeIngredient?.quantity ?? 1, // Copy quantity, default if missing
-              // Timestamps for RecipeIngredient are often false or handled by DB default
-          }));
-          await RecipeIngredient.bulkCreate(newRecipeIngredients, { transaction });
-      }
-
-      await UserFavorite.findOrCreate({
-        where: { userId: userId, recipeId: newRecipe.id },
-        transaction // Make sure it's part of the transaction
-      });
-
-      // 4. Commit transaction
-      await transaction.commit();
-
-      // 5. Respond with the new recipe's ID (or the full object)
-      res.status(201).json({ message: 'Recipe copied successfully', newRecipeId: newRecipe.id });
-
-  } catch (error) {
-      await transaction.rollback(); // Rollback on any error
-      console.error('Error copying recipe:', error);
-      res.status(500).json({ message: 'Server error copying recipe' });
-  }
-};
-
-// Update User's Own Recipe
-exports.updateRecipe = async (req, res) => {
-  const recipeIdToUpdate = req.params.id;
-  const userId = req.user.id;
-  // Allow updating title, description, steps for now
-  const { title, description, steps, prep_time, cook_time, total_time, difficulty, servings, meal_type, best_time } = req.body;
-
-  // Basic validation
-  if (!title || title.trim() === '') {
-      return res.status(400).json({ message: 'Recipe title cannot be empty' });
-  }
-
-  try {
-      const recipe = await Recipe.findByPk(recipeIdToUpdate, {
-          include: [{
-              model: Ingredient,
-              as: 'Ingredients',
-              through: { attributes: [] },
-              attributes: ['id', 'name']
-          }]
-      });
-
-      if (!recipe) {
-          return res.status(404).json({ message: 'Recipe not found' });
-      }
-
-      // Verify ownership! User can only update their own copies/creations
-      if (recipe.user_id !== userId) {
-          return res.status(403).json({ message: 'You can only edit your own recipes' });
-      }
-
-      // Get ingredients text for AI insight generation
-      const ingredientsText = recipe.Ingredients ? 
-          recipe.Ingredients.map(ing => ing.name).join(', ') : '';
-          
-      // If any relevant fields changed, generate a new AI insight
-      const shouldUpdateInsight = 
-          title !== recipe.title || 
-          description !== recipe.description || 
-          difficulty !== recipe.difficulty || 
-          meal_type !== recipe.meal_type;
-          
-      // Generate new AI insight if needed
-      let aiInsight = recipe.ai_insight;
-      if (shouldUpdateInsight) {
-          try {
-              aiInsight = await openaiService.generateRecipeInsight(
-                  title.trim(),
-                  description ?? recipe.description,
-                  ingredientsText,
-                  difficulty ?? recipe.difficulty,
-                  meal_type ?? recipe.meal_type
-              );
-          } catch (insightError) {
-              console.error('Error generating updated recipe insight:', insightError);
-              // Continue with previous insight if generation fails
-          }
-      }
-
-      // Update the recipe
-      const [updatedCount] = await Recipe.update({
-          title: title.trim(),
-          description: description ?? recipe.description, // Use existing if not provided
-          steps: steps ?? recipe.steps,
-          prep_time: prep_time ?? recipe.prep_time,
-          cook_time: cook_time ?? recipe.cook_time,
-          total_time: total_time ?? recipe.total_time,
-          difficulty: difficulty ?? recipe.difficulty,
-          servings: servings ?? recipe.servings,
-          meal_type: meal_type ?? recipe.meal_type,
-          best_time: best_time ?? recipe.best_time,
-          ai_insight: aiInsight, // Update with new or existing insight
-          // Not updating ingredients here yet
-      }, {
-          where: { id: recipeIdToUpdate, user_id: userId } // Redundant user_id check for safety
-      });
-
-      if (updatedCount === 0) {
-           // Should only happen in a race condition or if findByPk failed somehow
-           return res.status(404).json({ message: 'Recipe not found or update failed' });
-      }
-
-       // Fetch updated recipe data to return
-       const updatedRecipe = await Recipe.findByPk(recipeIdToUpdate, {
-          include: [{ model: Ingredient, as: 'Ingredients', through: {attributes: []}, attributes: ['id', 'name']}]
-       });
-
-      res.status(200).json({ message: 'Recipe updated successfully', recipe: updatedRecipe });
-
-  } catch (error) {
-      console.error('Error updating recipe:', error);
-      res.status(500).json({ message: 'Server error updating recipe' });
-  }
-};
-
 // Delete User's Own Recipe
 exports.deleteRecipe = async (req, res) => {
   const recipeIdToDelete = req.params.id;
@@ -406,7 +244,10 @@ exports.deleteRecipe = async (req, res) => {
           return res.status(403).json({ message: 'Forbidden: You can only delete your own recipes' });
       }
 
-      // Proceed with deletion
+      // Get the image filename before deleting the recipe
+      const imageFilename = recipe.image_url;
+
+      // Proceed with recipe deletion
       await Recipe.destroy({
           where: {
               id: recipeIdToDelete,
@@ -417,10 +258,247 @@ exports.deleteRecipe = async (req, res) => {
       // Also remove any favorites pointing to this deleted recipe
       await UserFavorite.destroy({ where: { recipeId: recipeIdToDelete }});
 
+      // Delete the image file if it exists
+      if (imageFilename) {
+          const imagePath = path.join(__dirname, '../../public/images/recipes', imageFilename);
+          try {
+              await fs.promises.unlink(imagePath);
+              console.log('Successfully deleted image file:', imageFilename);
+          } catch (fsError) {
+              console.error('Error deleting image file:', fsError);
+              // Continue even if image deletion fails - the recipe is already deleted
+          }
+      }
+
       res.status(200).json({ message: 'Recipe deleted successfully' });
 
   } catch (error) {
       console.error('Error deleting recipe:', error);
       res.status(500).json({ message: 'Server error deleting recipe' });
+  }
+};
+
+// Create a new recipe
+exports.createRecipe = async (req, res) => {
+  const userId = req.user.id; // From verifyToken middleware
+  const { 
+    title, 
+    description, 
+    ingredients, // comma-separated string
+    steps, // comma-separated string for simplicity
+    prep_time, 
+    cook_time, 
+    total_time, 
+    difficulty, 
+    servings, 
+    meal_type, 
+    best_time,
+    image_data // Base64 encoded image
+  } = req.body;
+
+  // Basic validation
+  if (!title || title.trim() === '') {
+    return res.status(400).json({ message: 'Recipe title is required' });
+  }
+
+  if (!ingredients || !ingredients.trim()) {
+    return res.status(400).json({ message: 'Ingredients are required' });
+  }
+
+  if (!steps || !steps.trim()) {
+    return res.status(400).json({ message: 'Preparation steps are required' });
+  }
+
+  const transaction = await sequelize.transaction();
+
+  try {
+    // 1. Create the new recipe
+    const recipeId = uuidv4();
+    
+    // 2. Handle image upload if provided
+    let image_url = null;
+    if (image_data) {
+      try {
+        // Extract image data from base64 string
+        const matches = image_data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+        
+        if (matches && matches.length === 3) {
+          const imageType = matches[1].split('/')[1];
+          const imageBuffer = Buffer.from(matches[2], 'base64');
+          
+          // Validate file size - max 3MB
+          if (imageBuffer.length > 3 * 1024 * 1024) {
+            console.warn('Image too large, exceeding 3MB limit');
+            // Continue without image if it's too large
+          } else {
+            // Create filename based on recipe ID
+            const filename = `recipe-${recipeId}.${imageType === 'jpeg' ? 'jpg' : imageType}`;
+            
+            // Directory for recipe images
+            const imageDir = path.join(__dirname, '../../public/images/recipes');
+            const imagePath = path.join(imageDir, filename);
+            
+            console.log('Saving image to path:', imagePath);
+            
+            try {
+              // Ensure directory exists
+              await fs.promises.mkdir(imageDir, { recursive: true });
+              
+              // Save image to filesystem
+              await fs.promises.writeFile(imagePath, imageBuffer);
+              
+              // Log success
+              console.log('Image successfully saved to', filename);
+              
+              // Set image URL to be stored in the database (just the filename)
+              image_url = filename;
+            } catch (fsError) {
+              console.error('Filesystem error when saving image:', fsError);
+              // Continue without image
+            }
+          }
+        }
+      } catch (imageError) {
+        console.error('Error processing image:', imageError);
+        // Continue without image if there's an error
+      }
+    }
+    
+    // Process steps - ensure they're clean and comma-separated
+    let processedSteps = steps.trim();
+    // If steps already contain newlines, replace them with commas
+    if (processedSteps.includes('\n')) {
+      processedSteps = processedSteps
+        .split('\n')
+        .map(step => step.replace(/^\d+\.\s*/, '').trim()) // Remove numbering
+        .filter(step => step) // Remove empty steps
+        .join(', ');
+    }
+    // Ensure proper comma formatting - no extra spaces around commas
+    processedSteps = processedSteps
+      .split(',')
+      .map(step => step.trim())
+      .filter(step => step)
+      .join(', ');
+
+    // 3. Create the recipe in the database
+    const newRecipe = await Recipe.create({
+      id: recipeId,
+      title: title.trim(),
+      description: description || '',
+      steps: processedSteps,
+      prep_time: prep_time || 0,
+      cook_time: cook_time || 0,
+      total_time: total_time || 0,
+      difficulty: difficulty || 'Medium',
+      servings: servings || 2,
+      meal_type: meal_type || 'Dinner',
+      best_time: best_time || 'Evening',
+      user_id: userId,
+      source_recipe_id: null, // This is an original recipe
+      image_url: image_url, // Add the image URL
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }, { transaction });
+
+    // 4. Process ingredients (simple comma-separated for now)
+    const ingredientsList = ingredients.split(',').map(item => item.trim()).filter(item => item);
+    
+    for (const ingredientName of ingredientsList) {
+      // Find or create the ingredient
+      const [ingredient] = await Ingredient.findOrCreate({
+        where: { name: ingredientName },
+        defaults: { 
+          id: uuidv4(), 
+          name: ingredientName,
+          unit: 'unit', // Add default unit
+          calories: 0    // Add default calories 
+        },
+        transaction
+      });
+
+      // Associate ingredient with recipe
+      await RecipeIngredient.create({
+        id: uuidv4(),
+        recipe_id: recipeId,
+        ingredient_id: ingredient.id,
+        quantity: 1 // Default quantity
+      }, { transaction });
+    }
+
+    // 5. Generate AI insight
+    try {
+      const ingredientsText = ingredientsList.join(', ');
+      
+      // Use our new AI service that has built-in fallbacks
+      const insight = await aiService.generateRecipeInsight(
+        title.trim(),
+        description || '',
+        ingredientsText,
+        difficulty || 'Medium',
+        meal_type || 'Dinner'
+      );
+      
+      // Update recipe with the insight
+      await Recipe.update(
+        { ai_insight: insight },
+        { 
+          where: { id: recipeId },
+          transaction
+        }
+      );
+      
+      // Add the insight to the newRecipe object
+      newRecipe.ai_insight = insight;
+    } catch (insightError) {
+      console.error('Error generating recipe insight:', insightError);
+      // Continue without insight if generation fails - our AI service should already handle fallbacks
+    }
+
+    // 6. Commit transaction
+    await transaction.commit();
+
+    // 7. Respond with the new recipe ID
+    res.status(201).json({ 
+      message: 'Recipe created successfully', 
+      recipeId: recipeId 
+    });
+  } catch (error) {
+    await transaction.rollback();
+    console.error('Error creating recipe:', error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
+    res.status(500).json({ message: 'Server error creating recipe' });
+  }
+};
+
+// Get user's own recipes
+exports.getUserRecipes = async (req, res) => {
+  try {
+    const userId = req.user.id; // From verifyToken middleware
+    
+    const recipes = await Recipe.findAll({
+      where: { user_id: userId },
+      attributes: ['id', 'title', 'description', 'image_url', 'source_recipe_id', 'user_id', 'createdAt'],
+      include: [{
+        model: Ingredient,
+        as: 'Ingredients',
+        through: { attributes: [] },
+        attributes: ['id', 'name']
+      }]
+    });
+    
+    // Add full URL to images
+    const recipesWithFullImageUrls = recipes.map(recipe => {
+      const plainRecipe = recipe.get({ plain: true });
+      if (plainRecipe.image_url) {
+        plainRecipe.image_url = `${BASE_URL}/images/recipes/${plainRecipe.image_url.replace(/^\/images\/recipes\//, '')}`;
+      }
+      return plainRecipe;
+    });
+    
+    return res.status(200).json(recipesWithFullImageUrls);
+  } catch (error) {
+    console.error('Error fetching user recipes:', error);
+    return res.status(500).json({ message: 'Server error' });
   }
 };

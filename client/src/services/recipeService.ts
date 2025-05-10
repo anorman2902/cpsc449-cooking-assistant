@@ -90,49 +90,6 @@ export const getRecipeById = async (id: string): Promise<Recipe | null> => {
   }
 }; 
 
-// Creates a user-editable copy of a recipe.
-export const copyRecipeForUser = async (originalRecipeId: string, token: string): Promise<{ message: string, newRecipeId: string }> => {
-  try {
-      const response = await fetch(`${API_URL}/recipes/${originalRecipeId}/copy`, {
-          method: 'POST',
-          headers: getAuthHeaders(token), // Requires authentication
-      });
-      return handleResponse(response);
-  } catch (error) {
-      console.error('Copy recipe API error:', error);
-      throw error;
-  }
-};
-
-// Updates a recipe owned by the user.
-// Define the shape of data allowed for update
-interface RecipeUpdateData {
-  title?: string;
-  description?: string;
-  steps?: string;
-  prep_time?: number;
-  cook_time?: number;
-  total_time?: number;
-  difficulty?: 'Easy' | 'Medium' | 'Hard';
-  servings?: number;
-  meal_type?: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack';
-  best_time?: 'Morning' | 'Afternoon' | 'Evening';
-  // ingredients not handled yet
-}
-export const updateMyRecipe = async (recipeId: string, token: string, updateData: RecipeUpdateData): Promise<{ message: string, recipe: Recipe }> => {
-  try {
-      const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
-          method: 'PUT',
-          headers: getAuthHeaders(token), // Requires authentication
-          body: JSON.stringify(updateData),
-      });
-      return handleResponse(response);
-  } catch (error) {
-      console.error('Update recipe API error:', error);
-      throw error;
-  }
-};
-
 export const deleteMyRecipe = async (recipeId: string, token: string): Promise<{ message: string }> => {
   try {
       const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
@@ -143,5 +100,43 @@ export const deleteMyRecipe = async (recipeId: string, token: string): Promise<{
   } catch (error) {
       console.error('Delete recipe API error:', error);
       throw error;
+  }
+};
+
+// Create a new recipe from scratch
+export interface CreateRecipeData {
+  title: string;
+  description?: string;
+  ingredients: string; // Comma-separated string of ingredients
+  steps: string; // Comma-separated string of steps
+  prep_time?: number;
+  cook_time?: number;
+  total_time?: number;
+  difficulty?: 'Easy' | 'Medium' | 'Hard';
+  servings?: number;
+  meal_type?: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack';
+  best_time?: 'Morning' | 'Afternoon' | 'Evening';
+  image_data?: string; // Base64 encoded image data
+}
+
+export const createNewRecipe = async (token: string, recipeData: CreateRecipeData): Promise<{ message: string, recipeId: string }> => {
+  try {
+    console.log('Making API request to create recipe');
+    const response = await fetch(`${API_URL}/recipes`, {
+      method: 'POST',
+      headers: getAuthHeaders(token),
+      body: JSON.stringify(recipeData),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      console.error('Server error response:', errorData);
+      throw new Error(`Server error: ${errorData.message || response.statusText}`);
+    }
+    
+    return handleResponse(response);
+  } catch (error) {
+    console.error('Create recipe API error:', error);
+    throw error;
   }
 };

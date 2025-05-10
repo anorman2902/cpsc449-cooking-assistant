@@ -3,13 +3,13 @@
  */
 import React, { useState, useEffect } from 'react';
 import './RecipeDetails.css';
-import { getRecipeById, Recipe, copyRecipeForUser, deleteMyRecipe } from '../../services/recipeService';
+import { getRecipeById, Recipe, deleteMyRecipe } from '../../services/recipeService';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { favoriteApi } from '../../services/userService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart as fasHeart, faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons'; 
-import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons'; 
+import { faHeart as fasHeart, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
 
 interface RecipeDetailsProps {
   recipeId: string;
@@ -32,7 +32,6 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({ recipeId, onBack /*, onNa
   const { token, isAuthenticated, favoriteIds, addFavoriteId, removeFavoriteId, user } = useAuth();
   const [isFavorited, setIsFavorited] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
-  const [copyLoading, setCopyLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Fetch recipe details when component mounts or recipeId changes
@@ -95,32 +94,6 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({ recipeId, onBack /*, onNa
       alert('Could not update favorite status. Please try again.');
     } finally {
       setFavLoading(false);
-    }
-  };
-
-  // --- Copy Click Handler ---
-  const handleCopyClick = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!isAuthenticated || !token || !recipe) {
-      alert('Please log in to copy recipes.');
-      // Optionally navigate: onNavigate('auth');
-      return;
-    }
-
-    const confirmCopy = window.confirm(`Create your own customizable copy of "${recipe.title}"?`);
-    if (!confirmCopy) return;
-
-    setCopyLoading(true);
-    try {
-      const result = await copyRecipeForUser(recipe.id, token);
-      addFavoriteId(result.newRecipeId); // Also favorite the new copy automatically
-      alert(`Recipe copied! You can now find and customize it in "My Recipes".`);
-      // TODO: navigate to edit ui ?
-    } catch (error) {
-      console.error('Failed to copy recipe', error);
-      alert('Could not copy recipe. Please try again.');
-    } finally {
-      setCopyLoading(false);
     }
   };
 
@@ -200,50 +173,22 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({ recipeId, onBack /*, onNa
             {isAuthenticated && (
               <button
                 onClick={handleFavoriteToggle}
-                style={{ ...buttonBaseStyles, color: isFavorited ? 'red' : 'grey' }} // Use base styles
+                style={{ ...buttonBaseStyles, color: isFavorited ? 'red' : 'grey' }}
                 disabled={favLoading}
                 aria-label={isFavorited ? `Remove ${recipe.title} from favorites` : `Add ${recipe.title} to favorites`}
               >
                 <FontAwesomeIcon icon={isFavorited ? fasHeart : farHeart} />
               </button>
             )}
-            {!isAuthenticated && ( // Placeholder Favorite
+            {!isAuthenticated && (
                <button style={{ ...buttonBaseStyles, color: 'grey' }} onClick={() => alert('Please log in to favorite.')}><FontAwesomeIcon icon={farHeart} /></button>
-            )}
-
-            {/* Edit/copy Button (Show for original recipes when logged in) */}
-            {isAuthenticated && recipe.source_recipe_id === null && (
-              <button
-                onClick={handleCopyClick}
-                style={{ ...buttonBaseStyles, opacity: copyLoading ? 0.5 : 1, color: "grey"}} // Use base styles
-                disabled={copyLoading}
-                aria-label={`Create a copy of ${recipe.title}`}
-              >
-                <FontAwesomeIcon icon={faPencilAlt} title="Make your own copy"/> {/* Using Pencil for "Copy/Customize" */}
-              </button>
-            )}
-            {!isAuthenticated && recipe.source_recipe_id === null && ( // Placeholder Copy
-               <button style={{ ...buttonBaseStyles, color: 'grey' }} onClick={() => alert('Please log in to copy.')}><FontAwesomeIcon icon={faPencilAlt} title="Make your own copy"/></button>
-            )}
-
-            {/* Edit Button (Show for *owned* recipes when logged in) */}
-            {isAuthenticated && user?.id === recipe.user_id && (
-               <button
-                  // onClick={handleEditClick} // <-- Define this handler next when building Edit UI
-                  onClick={() => alert('Edit functionality coming soon!')} // Placeholder action
-                  style={{ ...buttonBaseStyles, color: 'var(--primary-color)'}}
-                  disabled={false} // Enable when Edit UI is ready
-                  aria-label={`Edit ${recipe.title}`}
-               >
-                  <FontAwesomeIcon icon={faPencilAlt} title="Edit this recipe"/> {/* Re-using Pencil for Edit */}
-               </button>
             )}
 
             {/* Delete Button (Show for *owned* recipes when logged in) */}
             {isAuthenticated && user?.id === recipe.user_id && (
               <button
                 onClick={handleDeleteClick}
-                style={{ ...buttonBaseStyles, color: 'var(--danger-color)', opacity: deleteLoading ? 0.5 : 1 }} // Use base styles
+                style={{ ...buttonBaseStyles, color: 'var(--danger-color)', opacity: deleteLoading ? 0.5 : 1 }}
                 disabled={deleteLoading}
                 aria-label={`Delete ${recipe.title}`}
               >
@@ -328,9 +273,8 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({ recipeId, onBack /*, onNa
           <div className="recipe-steps">
             <h2>Preparation Steps</h2>
             <ol className="steps-list">
-              {recipe.steps.split('\n').map((step, index) => {
-                const cleanedStep = step.replace(/^\d+\.\s*/, '').trim();
-                // Only render non-empty steps
+              {recipe.steps.split(',').map((step, index) => {
+                const cleanedStep = step.trim();
                 return cleanedStep ? <li key={index} className="step-item">{cleanedStep}</li> : null;
               })}
             </ol>

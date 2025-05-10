@@ -91,6 +91,8 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage }) => {
           <>
             <a href="/favorites" className={`nav-link ${currentPage === 'favorites' ? 'active' : ''}`}
               onClick={(e) => handleNavClick(e, 'favorites')}>My Recipes</a>
+            <a href="/create-recipe" className={`nav-link ${currentPage === 'create-recipe' ? 'active' : ''}`}
+              onClick={(e) => handleNavClick(e, 'create-recipe')}>Create Recipe</a>
             <a href="/profile" className={`nav-link profile-link ${currentPage === 'profile' ? 'active' : ''}`}
               onClick={(e) => handleNavClick(e, 'profile')}>Profile</a>
             <a href="/logout" className="nav-link logout-link" onClick={handleLogout}>Logout</a>

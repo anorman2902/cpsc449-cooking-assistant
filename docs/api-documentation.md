@@ -197,6 +197,50 @@ GET /api/recipes/search/chicken
 ]
 ```
 
+### Create Recipe
+
+Creates a new recipe with ingredients.
+
+- **URL:** `/recipes`
+- **Method:** `POST`
+- **Authentication:** Required
+- **Content-Type:** `application/json`
+
+**Request Body:**
+
+```json
+{
+  "title": "Simple Pancakes",
+  "description": "Quick and easy pancakes for breakfast",
+  "ingredients": "flour, eggs, milk, sugar, salt",
+  "steps": "Mix dry ingredients, Add wet ingredients, Cook on hot griddle",
+  "prep_time": 10,
+  "cook_time": 15,
+  "total_time": 25,
+  "difficulty": "Easy",
+  "servings": 4,
+  "meal_type": "Breakfast",
+  "best_time": "Morning",
+  "image_data": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4gIc..."
+}
+```
+
+**Notes:**
+- `ingredients` is a comma-separated string of ingredient names
+- `steps` is a comma-separated string of preparation steps
+- All fields except `title`, `ingredients`, and `steps` are optional
+- `image_data` should be a base64-encoded image string (JPEG, JPG, or PNG format, max 3MB)
+- Images will be stored on the server and accessible via URL
+
+**Response:**
+
+```json
+{
+  "message": "Recipe created successfully",
+  "recipeId": "550e8400-e29b-41d4-a716-446655440008"
+}
+```
+
 ## Test Endpoint
 
 A simple endpoint to test if the API is working.

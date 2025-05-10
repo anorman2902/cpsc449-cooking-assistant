@@ -11,9 +11,9 @@ import { useTheme } from '../../../contexts/ThemeContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { favoriteApi } from '../../../services/userService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart as fasHeart, faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons'; // Solid heart, pencil
-import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons'; // Regular (empty) heart
-import { copyRecipeForUser, deleteMyRecipe } from '../../../services/recipeService';
+import { faHeart as fasHeart, faTrash } from '@fortawesome/free-solid-svg-icons'; // Removed faPencilAlt
+import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
+import { deleteMyRecipe } from '../../../services/recipeService'; // Removed copyRecipeForUser
 
 interface RecipeCardProps {
   recipe: Recipe & { user_id?: string; source_recipe_id?: string | null }; 
@@ -39,8 +39,6 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick, pageContext = 
   const [isFavorited, setIsFavorited] = useState(false);
   // Local state for loading status of the favorite action
   const [favLoading, setFavLoading] = useState(false);
-
-  const [copyLoading, setCopyLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
@@ -85,39 +83,6 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick, pageContext = 
       alert('Could not update favorite status. Please try again.');
     } finally {
       setFavLoading(false); // Finish loading state
-    }
-  };
-
-  // Handle Copy Click
-  const handleCopyClick = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
-
-    if (!isAuthenticated || !token) {
-        alert('Please log in to copy recipes.');
-        // onNavigate('auth'); // Optional redirect
-        return;
-    }
-
-    // Confirmation Pop-up
-    const confirmCopy = window.confirm(`Create your own customizable copy of "${recipe.title}"?`);
-    if (!confirmCopy) {
-        return;
-    }
-
-    setCopyLoading(true);
-    try {
-        const result = await copyRecipeForUser(recipe.id, token);
-        addFavoriteId(result.newRecipeId);
-        alert(`Recipe copied! You can now customize it in your collection.`);
-        // TODO: Optionally navigate to the new recipe details or an edit page
-        // Example: onClick(result.newRecipeId); // Navigate to the new copy's details
-        // Example: onNavigate(`/edit-recipe/${result.newRecipeId}`); // Navigate to edit page (requires routing)
-
-    } catch (error) {
-        console.error('Failed to copy recipe', error);
-        alert('Could not copy recipe. Please try again.');
-    } finally {
-        setCopyLoading(false);
     }
   };
 
@@ -225,26 +190,6 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick, pageContext = 
               />
             </button>
           )}
-          {/* Copy/Edit Button */}
-          {isAuthenticated && (
-            <button
-              onClick={handleCopyClick}
-              style={{
-                cursor: copyLoading ? "wait" : "pointer",
-                background: "none",
-                border: "none",
-                padding: "0",
-                fontSize: "1.5rem",
-                lineHeight: "1",
-                color: "var(--text-color)", // Use theme color
-                opacity: copyLoading ? 0.5 : 1,
-              }}
-              disabled={copyLoading}
-              aria-label={`Customize ${recipe.title}`}
-            >
-              <FontAwesomeIcon icon={faPencilAlt} color={"var(--text-color)"} />
-            </button>
-          )}
           {/* Delete Button */}
           {showDelete && (
             <button
@@ -267,12 +212,6 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick, pageContext = 
                 onClick={() => alert("Please log in to favorite recipes.")}
               >
                 <FontAwesomeIcon icon={farHeart} />
-              </button>
-              <button
-                style={{ ...buttonBaseStyles, color: "grey" }}
-                onClick={() => alert("Please log in to customize recipes.")}
-              >
-                <FontAwesomeIcon icon={faPencilAlt} />
               </button>
             </>
           )}
